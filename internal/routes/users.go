@@ -9,6 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// getUserByUsername godoc
+//
+// @Summary 			search user
+// @Description 	get user by username, verify if password is correct
+// @Tags 					users
+// @Accept 				json
+// @Produce 			json
+// @Param 				json	query	model.UserRequest	true	"Username and Password"
+// @Success				200	{array}		model.User
+// @Failure 			400 {object}	model.HTTPError
+// @Failure 			401 {object}	model.HTTPError
+// @Failure 			500 {object}	model.HTTPError
+// @Router 				/api/user [get]
 func getUserByUsername(ctx *gin.Context){
 	var userReq model.UserRequest
 

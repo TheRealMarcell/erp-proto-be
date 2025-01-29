@@ -9,3 +9,7 @@ run:
 tidy: 
 	@echo "Cleaning and updating go.mod"
 	go mod tidy
+
+swag-docs:
+	@echo "Generating swagger documentation"
+	swag init -g cmd/api.go

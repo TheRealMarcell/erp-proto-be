@@ -1,0 +1,72 @@
+basePath: /api
+definitions:
+  model.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  model.User:
+    properties:
+      password:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: marcellusgerson@gmail.com
+    name: Marcellus Simanjuntak
+  description: This is a sandbox API for ERP Prototype Service used for development
+    purposes
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Sandbox API - ERP Prototype Service
+  version: "1.1"
+paths:
+  /api/user:
+    get:
+      consumes:
+      - application/json
+      description: get user by username, verify if password is correct
+      parameters:
+      - in: query
+        name: password
+        type: string
+      - in: query
+        name: username
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.HTTPError'
+      summary: search user
+      tags:
+      - users
+swagger: "2.0"
