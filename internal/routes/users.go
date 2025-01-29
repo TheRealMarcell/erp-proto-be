@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// getUserByUsername godoc
+// verifyUserByPassword godoc
 //
 // @Summary 			search user
 // @Description 	get user by username, verify if password is correct
@@ -22,7 +22,7 @@ import (
 // @Failure 			401 {object}	model.HTTPError
 // @Failure 			500 {object}	model.HTTPError
 // @Router 				/api/user [get]
-func getUserByUsername(ctx *gin.Context){
+func verifyUserByPassword(ctx *gin.Context){
 	var userReq model.UserRequest
 
 	err := ctx.ShouldBindJSON(&userReq)

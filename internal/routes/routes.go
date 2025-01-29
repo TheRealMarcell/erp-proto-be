@@ -6,6 +6,6 @@ import (
 
 
 func RegisterRoutes(server *gin.RouterGroup){
-	server.GET("/user", getUserByUsername)
+	server.POST("/verify-user", verifyUserByPassword)
 
 }
