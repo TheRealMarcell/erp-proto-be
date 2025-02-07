@@ -53,8 +53,10 @@ func (sale *Sale) Save() error{
 	(item_id, transaction_number, description, quantity, price, total, discount, payment_id, timestamp)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
 
+	currentTime := time.Now()
+
 	_, err := db.Conn.Exec(context.Background(), query, sale.ItemID, sale.TransactionNumber, sale.Description, 
-	sale.Quantity, sale.Price, sale.Total, sale.Discount, sale.PaymentID, sale.Timestamp)
+	sale.Quantity, sale.Price, sale.Total, sale.Discount, sale.PaymentID, currentTime)
 
 	if err != nil{
 		return err

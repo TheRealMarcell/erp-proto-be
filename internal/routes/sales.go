@@ -19,22 +19,26 @@ func getAllSales(ctx *gin.Context){
 }
 
 func createNewSale(ctx *gin.Context){
-	var sale model.Sale
+	var sales []model.Sale
 
-	err := ctx.ShouldBindJSON(&sale)
+	err := ctx.ShouldBindJSON(&sales)
 
 	if err != nil{
 		fmt.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "could not parse sales request"})
 		return
 	}
+	// fmt.Println(sales)
 
-	err = sale.Save()
-	
-	if err != nil{
-		fmt.Println(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "could not save sale"})
-		return
+	for _, sale := range sales{
+		err = sale.Save()
+
+		if err != nil{
+			fmt.Println(err)
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "could not save sale"})
+			return
+		}
+		
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
