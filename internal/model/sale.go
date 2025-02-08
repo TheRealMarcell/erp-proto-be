@@ -3,20 +3,18 @@ package model
 import (
 	"context"
 	db "erp-api/database"
-	"time"
+	"fmt"
 )
 
 type Sale struct{
 	SaleID int64									`json:"sale_id"`
 	ItemID int64									`json:"item_id"`
-	TransactionNumber int64				`json:"transaction_number"`
 	Description string						`json:"description"`
 	Quantity int64								`json:"quantity"`
 	Price int64										`json:"price"`
 	Total int64										`json:"total"`
 	Discount float64							`json:"discount"`
-	PaymentID int64								`json:"payment_id"`
-	Timestamp time.Time						`json:"timestamp"`
+	TransactionID int64						`json:"transaction_id"`
 }
 
 func GetSales() ([] Sale, error){
@@ -34,8 +32,8 @@ func GetSales() ([] Sale, error){
 
 	for rows.Next(){
 		var sale Sale
-		err = rows.Scan(&sale.SaleID, &sale.ItemID, &sale.TransactionNumber, &sale.Description, &sale.Quantity,
-			&sale.Price, &sale.Total, &sale.Discount, &sale.PaymentID, &sale.Timestamp)
+		err = rows.Scan(&sale.SaleID, &sale.ItemID,&sale.Description, &sale.Quantity,
+			&sale.Price, &sale.Total, &sale.Discount)
 		
 		sales = append(sales, sale)
 	}
@@ -48,15 +46,16 @@ func GetSales() ([] Sale, error){
 	return sales, nil
 }
 
-func (sale *Sale) Save() error{
+func (sale *Sale) Save(transaction_id int64) error{
+	fmt.Println(transaction_id)
+	sale.TransactionID = transaction_id
+
 	query := `INSERT INTO sales 
-	(item_id, transaction_number, description, quantity, price, total, discount, payment_id, timestamp)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+	(item_id, description, quantity, price, total, discount, transaction_id)
+	VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
-	currentTime := time.Now()
-
-	_, err := db.Conn.Exec(context.Background(), query, sale.ItemID, sale.TransactionNumber, sale.Description, 
-	sale.Quantity, sale.Price, sale.Total, sale.Discount, sale.PaymentID, currentTime)
+	_, err := db.Conn.Exec(context.Background(), query, sale.ItemID, sale.Description, 
+	sale.Quantity, sale.Price, sale.Total, sale.Discount, sale.TransactionID)
 
 	if err != nil{
 		return err

@@ -11,4 +11,6 @@ func RegisterRoutes(server *gin.RouterGroup){
 	server.GET("/sales", getAllSales)
 	server.POST("/sales", createNewSale)
 
+	server.POST("/transactions", createTransaction)
+
 }

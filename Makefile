@@ -13,3 +13,7 @@ tidy:
 swag-docs:
 	@echo "Generating swagger documentation"
 	swag init -g cmd/api.go
+
+dev:
+	@echo "Running dev mode with air live-reload"
+	air 
