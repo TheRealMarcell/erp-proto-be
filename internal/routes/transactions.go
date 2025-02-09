@@ -8,6 +8,20 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func getAllTransactions(ctx *gin.Context){
+	transactions, err := model.GetTransactions()
+	if err != nil{
+		fmt.Println(err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not get transaction"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, transactions)
+
+
+
+}
+
 func createTransaction(ctx *gin.Context){
 	var transaction model.Transaction
 
