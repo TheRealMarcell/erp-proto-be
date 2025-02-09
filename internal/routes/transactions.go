@@ -2,6 +2,8 @@ package routes
 
 import (
 	"erp-api/internal/model"
+	"erp-api/util/httpres"
+
 	"fmt"
 	"net/http"
 
@@ -12,14 +14,11 @@ func getAllTransactions(ctx *gin.Context){
 	transactions, err := model.GetTransactions()
 	if err != nil{
 		fmt.Println(err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not get transaction"})
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not get transaction", nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, transactions)
-
-
-
+	httpres.APIResponse(ctx, http.StatusOK, "success", transactions)
 }
 
 func createTransaction(ctx *gin.Context){
@@ -29,17 +28,16 @@ func createTransaction(ctx *gin.Context){
 
 	if err != nil{
 		fmt.Println(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "could not parse sales request"})
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse sales request", nil)
 		return
 	}
 
 	err = transaction.Save()
 	if err != nil {
 		fmt.Println(err)
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not save transaction"})
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save transaction", nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "successfully saved transaction"})
-
+	httpres.APIResponse(ctx, http.StatusOK, "success", "successfully saved transaction")
 }

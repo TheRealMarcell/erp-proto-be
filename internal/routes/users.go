@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"erp-api/internal/model"
+	"erp-api/util/httpres"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,22 +29,21 @@ func verifyUserByPassword(ctx *gin.Context){
 	err := ctx.ShouldBindJSON(&userReq)
 	if err != nil{
 		fmt.Println(err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "failed to parse request"})
+		httpres.APIResponse(ctx, http.StatusBadRequest, "failed to parse request", nil)
 		return
 	}
 
 	// get user from database, pass the req body
 	user, err := model.GetUser(userReq)
 	if err != nil{
-		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not fetch user"})
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not fetch user", nil)
 		return
 	}
 
 	err = model.VerifyUser(userReq, user)
 	if err != nil{
-		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "unauthorised login, wrong password"})
+		httpres.APIResponse(ctx, http.StatusUnauthorized, "unauthorised login, wrong password", nil)
 		return
 	}
-
-	ctx.JSON(http.StatusOK, user)
+	httpres.APIResponse(ctx, http.StatusOK, "successfully verified user", user)
 }

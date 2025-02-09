@@ -1,6 +1,6 @@
 # Introduction
 
-ERP Prototype BE is a **REST API BE for the ERP Prototype Web Project**.
+ERP Prototype BE is a **REST API for the ERP Prototype Web Project**.
 
 # Requirements
 
@@ -19,7 +19,7 @@ This module requires the following toolkit(s):
 
 ## Running with Air (Dev build)
 1. Initialise with ```air init```
-2. Configure the .toml file by modifying the cmd to "go build -o ./tmp/main ./cmd"
+2. Configure the .toml file by modifying the cmd to ```go build -o ./tmp/main ./cmd```
 3. Run with live-reload using ```air -c .air.toml``` or simply ```air```
 
 ## Contributing
