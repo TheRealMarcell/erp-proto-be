@@ -14,6 +14,7 @@ func getAllSales(ctx *gin.Context){
 	if err != nil{
 		fmt.Println(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "could not fetch sales"})
+		return
 	}
 
 	ctx.JSON(http.StatusOK, sales)

@@ -32,8 +32,8 @@ func GetSales() ([] Sale, error){
 
 	for rows.Next(){
 		var sale Sale
-		err = rows.Scan(&sale.SaleID, &sale.ItemID,&sale.Description, &sale.Quantity,
-			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.TransactionID)
+		err = rows.Scan(&sale.SaleID, &sale.Description, &sale.Quantity,
+			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.TransactionID, &sale.ItemID)
 		
 		sales = append(sales, sale)
 	}

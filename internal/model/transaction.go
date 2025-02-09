@@ -3,7 +3,6 @@ package model
 import (
 	"context"
 	db "erp-api/database"
-	"fmt"
 	"time"
 )
 
@@ -57,19 +56,18 @@ func GetTransactions() ([]TransactionResponse, error){
 
 func (tr *Transaction) Save() error {
 	query := `
-	INSERT INTO transactions (transaction_id, discount_type, discount_percent, total_discount, payment_id, customer_name, timestamp)
-	VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	INSERT INTO transactions (discount_type, discount_percent, total_discount, payment_id, customer_name, timestamp)
+	VALUES ($1, $2, $3, $4, $5, $6)
+	RETURNING transaction_id`
 
 	currentTime := time.Now()
 
-	_, err := db.Conn.Exec(context.Background(), query, tr.TransactionID, tr.DiscountType, tr.DiscountPercent,
-	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime)
+	err := db.Conn.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
+	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime).Scan(&tr.TransactionID)
 
 	if err != nil{
 		return err
 	}
-
-	fmt.Println("TransactionID:", tr.TransactionID)
 
 	// save sale corresponding to transaction id
 	for _, sale := range tr.Sales{
