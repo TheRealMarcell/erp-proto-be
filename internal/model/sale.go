@@ -8,7 +8,7 @@ import (
 
 type Sale struct{
 	SaleID int64									`json:"sale_id"`
-	ItemID int64									`json:"item_id"`
+	ItemID string									`json:"item_id"`
 	Description string						`json:"description"`
 	Quantity int64								`json:"quantity"`
 	Price int64										`json:"price"`
