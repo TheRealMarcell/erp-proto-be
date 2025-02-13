@@ -29,7 +29,7 @@ func verifyUserByPassword(ctx *gin.Context){
 	err := ctx.ShouldBindJSON(&userReq)
 	if err != nil{
 		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusBadRequest, "failed to parse request", nil)
+		httpres.APIResponse(ctx, http.StatusBadRequest, "failed to parse request data", nil)
 		return
 	}
 
