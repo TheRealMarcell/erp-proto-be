@@ -5,11 +5,11 @@ import (
 	"erp-api/util/configuration"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/joho/godotenv"
 )
 
-var Conn *pgx.Conn
+var Conn *pgxpool.Pool
 
 func InitDB(){
 	logger := configuration.Logger()
@@ -19,7 +19,7 @@ func InitDB(){
     logger.Fatal("Error loading .env file")
   }
 
-	Conn, err = pgx.Connect(context.Background(), os.Getenv("DATABASE_URL"))
+	Conn, err = pgxpool.Connect(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
 		logger.Sugar().Fatalf("Failed to connect to the database: %v", err)
 	}

@@ -24,35 +24,11 @@ func moveItem(ctx *gin.Context){
 	}
 	inventory_move.ItemID = id
 
-	// qty, err := model.GetItemQty(inventory_move.ItemID, inventory_move.Source)
-
+	err = inventory_move.MoveItem()
 	if err != nil{
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not find item in storage", nil)
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
 		return
 	}
-
-	// source_qty := *qty - inventory_move.Quantity
-
-	var source_inventory_item model.StorageItem
-	source_inventory_item.Location = inventory_move.Source
-	source_inventory_item.Quantity = 200
-	source_inventory_item.ItemID = inventory_move.ItemID
-	source_inventory_item.Description = inventory_move.Description
-
-	err = source_inventory_item.UpdateItem()
-	if err !=nil{
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "failed to deduct item", nil)
-		return
-	}
-
-	var destination_inventory_item model.StorageItem
-
-	destination_inventory_item.Location = inventory_move.Destination
-	destination_inventory_item.Quantity = inventory_move.Quantity
-	destination_inventory_item.ItemID = inventory_move.ItemID
-	destination_inventory_item.Description = inventory_move.Description
-
-	destination_inventory_item.Save()
 
 	httpres.APIResponse(ctx, http.StatusOK, "successly moved", nil)
 }
