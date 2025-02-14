@@ -13,9 +13,10 @@ type InventoryRequest struct {
 }
 
 type InventoryItem struct {
-	ItemID      string `json:"item_id"`
-	Quantity       int64  `json:"quantity"`
-	Description string `json:"description"`
+	ItemID string 					`json:"item_id"`
+	Quantity int64 				 	`json:"quantity"`
+	Description string 			`json:"description"`
+	Price int64							`json:"price"`
 }
 
 func (item InventoryRequest) MoveItem() error{
@@ -32,7 +33,6 @@ func (item InventoryRequest) MoveItem() error{
 	source_inventory_item.Location = item.Source
 	source_inventory_item.Quantity = source_qty
 	source_inventory_item.ItemID = item.ItemID
-	source_inventory_item.Description = item.Description
 
 	err = source_inventory_item.UpdateItem()
 	if err !=nil{
@@ -45,7 +45,6 @@ func (item InventoryRequest) MoveItem() error{
 	destination_inventory_item.Location = item.Destination
 	destination_inventory_item.Quantity = item.Quantity
 	destination_inventory_item.ItemID = item.ItemID
-	destination_inventory_item.Description = item.Description
 
 	err = destination_inventory_item.Save()
 	if err !=nil{
@@ -72,7 +71,11 @@ func GetInventory(location string) ([]InventoryItem, error) {
 		return nil, fmt.Errorf("invalid location: %s", location)
 	}
 
-	query := fmt.Sprintf("SELECT item_id, quantity, description FROM %s", inventoryTable)
+	query := fmt.Sprintf(`
+	SELECT i.item_id, quantity, i.description, price 
+	FROM %s i
+	INNER JOIN items ON i.item_id = items.item_id
+	`, inventoryTable)
 
 	rows, err := db.Conn.Query(context.Background(), query)
 	if err != nil {
@@ -84,7 +87,7 @@ func GetInventory(location string) ([]InventoryItem, error) {
 
 	for rows.Next() {
 		var item InventoryItem
-		err = rows.Scan(&item.ItemID, &item.Quantity, &item.Description)
+		err = rows.Scan(&item.ItemID, &item.Quantity, &item.Description, &item.Price)
 		if err != nil {
 			return nil, err
 		}

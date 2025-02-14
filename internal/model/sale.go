@@ -15,12 +15,14 @@ type Sale struct{
 	Total int64										`json:"total"`
 	DiscountPerItem float64				`json:"discount_per_item"`
 	TransactionID int64						`json:"transaction_id"`
+	Location string								`json:"location"`
 }
 
 func GetSales() ([] Sale, error){
 	query := `
-	SELECT * FROM SALES
-	ORDER BY sale_id 
+	SELECT sale_id, description, quantity, price, total, discount_per_item, transactions.transaction_id, item_id, location
+	FROM sales INNER JOIN transactions on sales.transaction_id = transactions.transaction_id
+	ORDER BY sale_id
 	`
 
 	rows, err := db.Conn.Query(context.Background(), query)
@@ -33,7 +35,7 @@ func GetSales() ([] Sale, error){
 	for rows.Next(){
 		var sale Sale
 		err = rows.Scan(&sale.SaleID, &sale.Description, &sale.Quantity,
-			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.TransactionID, &sale.ItemID)
+			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.TransactionID, &sale.ItemID, &sale.Location)
 		
 		sales = append(sales, sale)
 	}
@@ -41,7 +43,6 @@ func GetSales() ([] Sale, error){
 	if err != nil{
 		return nil, err
 	}
-
 
 	return sales, nil
 }
@@ -57,11 +58,11 @@ func (sale *Sale) Save(transaction_id int64, location string) error{
 	}
 
 	query := `INSERT INTO sales 
-	(item_id, description, quantity, price, total, discount_per_item, transaction_id, location)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+	(item_id, description, quantity, price, total, discount_per_item, transaction_id)
+	VALUES ($1, $2, $3, $4, $5, $6, $7)`
 
 	_, err = db.Conn.Exec(context.Background(), query, sale.ItemID, sale.Description, 
-	sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, sale.TransactionID, location)
+	sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, sale.TransactionID)
 
 	if err != nil{
 		return err

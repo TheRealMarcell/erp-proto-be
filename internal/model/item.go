@@ -78,10 +78,10 @@ func (item *StorageItem) Save() error{
 
 func (item *StorageItem) UpdateItem() error{
 	query := fmt.Sprintf(`UPDATE %s
-	SET quantity = $1, description = $2
-	WHERE item_id = $3`, item.Location)
+	SET quantity = $1
+	WHERE item_id = $2`, item.Location)
 
-	_, err := db.Conn.Query(context.Background(), query, item.Quantity, item.Description, item.ItemID)
+	_, err := db.Conn.Query(context.Background(), query, item.Quantity, item.ItemID)
 
 	if err != nil{
 		return err
