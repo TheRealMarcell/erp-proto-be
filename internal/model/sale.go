@@ -46,16 +46,22 @@ func GetSales() ([] Sale, error){
 	return sales, nil
 }
 
-func (sale *Sale) Save(transaction_id int64) error{
+func (sale *Sale) Save(transaction_id int64, location string) error{
 	fmt.Println(transaction_id)
 	sale.TransactionID = transaction_id
 
-	query := `INSERT INTO sales 
-	(item_id, description, quantity, price, total, discount_per_item, transaction_id)
-	VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	err := UpdateInventory(sale.ItemID, sale.Quantity, location)
 
-	_, err := db.Conn.Exec(context.Background(), query, sale.ItemID, sale.Description, 
-	sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, sale.TransactionID)
+	if err != nil {
+		return err
+	}
+
+	query := `INSERT INTO sales 
+	(item_id, description, quantity, price, total, discount_per_item, transaction_id, location)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
+
+	_, err = db.Conn.Exec(context.Background(), query, sale.ItemID, sale.Description, 
+	sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, sale.TransactionID, location)
 
 	if err != nil{
 		return err
@@ -64,3 +70,37 @@ func (sale *Sale) Save(transaction_id int64) error{
 	return nil
 }
 
+
+// updates stock for the specific location
+func UpdateInventory(itemID string, quantity int64, location string) error {
+	fmt.Println("Updating inventory for location:", location)
+
+	var inventoryTable string
+	switch location {
+	case "tiktok":
+		inventoryTable = "inventory_tiktok"
+	case "toko":
+		inventoryTable = "inventory_toko"
+	default:
+		return fmt.Errorf("invalid location: %s", location)
+	}
+
+	// Update stock and ensure at least one row was affected
+	query := fmt.Sprintf(`
+		UPDATE %s 
+		SET quantity = quantity - $1 
+		WHERE item_id = $2 AND quantity >= $1`, inventoryTable)
+
+	res, err := db.Conn.Exec(context.Background(), query, quantity, itemID)
+	if err != nil {
+		return fmt.Errorf("database error: %v", err)
+	}
+
+	rowsAffected := res.RowsAffected()
+	if rowsAffected == 0 {
+		return fmt.Errorf("insufficient stock for item: %s", itemID)
+	}
+
+	fmt.Printf("Stock updated for %s in %s. Rows affected: %d\n", itemID, inventoryTable, rowsAffected)
+	return nil
+}

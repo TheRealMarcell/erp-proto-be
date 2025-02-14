@@ -1,11 +1,21 @@
 package model
 
-import "fmt"
+import (
+	"context"
+	db "erp-api/database"
+	"fmt"
+)
 
 type InventoryRequest struct {
 	Source string							`json:"source"`
 	Destination string				`json:"destination"`
 	StorageItem
+}
+
+type InventoryItem struct {
+	ItemID      string `json:"item_id"`
+	Quantity       int64  `json:"quantity"`
+	Description string `json:"description"`
 }
 
 func (item InventoryRequest) MoveItem() error{
@@ -44,4 +54,42 @@ func (item InventoryRequest) MoveItem() error{
 	}
 	
 	return nil
+}
+
+// GetInventory retrieves inventory from a specified location
+func GetInventory(location string) ([]InventoryItem, error) {
+	var inventoryTable string
+
+	// Determine the table based on location
+	switch location {
+	case "toko":
+		inventoryTable = "inventory_toko"
+	case "tiktok":
+		inventoryTable = "inventory_tiktok"
+	case "gudang":
+		inventoryTable = "inventory_gudang"
+	default:
+		return nil, fmt.Errorf("invalid location: %s", location)
+	}
+
+	query := fmt.Sprintf("SELECT item_id, quantity, description FROM %s", inventoryTable)
+
+	rows, err := db.Conn.Query(context.Background(), query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var inventory []InventoryItem
+
+	for rows.Next() {
+		var item InventoryItem
+		err = rows.Scan(&item.ItemID, &item.Quantity, &item.Description)
+		if err != nil {
+			return nil, err
+		}
+		inventory = append(inventory, item)
+	}
+
+	return inventory, nil
 }

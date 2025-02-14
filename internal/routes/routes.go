@@ -19,5 +19,9 @@ func RegisterRoutes(server *gin.RouterGroup){
 	server.PUT("/items/:id", updateItem)
 
 	server.POST("/inventory/:id", moveItem)
+	inventory := server.Group("/inventory")
+	{
+		inventory.GET("/:location", getInventory)
+	}
 
 }

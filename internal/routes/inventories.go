@@ -32,3 +32,18 @@ func moveItem(ctx *gin.Context){
 
 	httpres.APIResponse(ctx, http.StatusOK, "successly moved", nil)
 }
+
+func getInventory(ctx *gin.Context) {
+	location := ctx.Param("location") // Get location from URL param
+
+	fmt.Println("Fetching inventory for location:", location)
+
+	inventory, err := model.GetInventory(location)
+	if err != nil {
+		fmt.Println("Error fetching inventory:", err)
+		httpres.APIResponse(ctx, http.StatusBadRequest, fmt.Sprintf("Invalid location: %s", location), nil)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "Inventory fetched successfully", inventory)
+}
