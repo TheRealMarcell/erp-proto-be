@@ -61,13 +61,45 @@ func GetItemQty(item_id string, location string) (*int64, error){
 }
 
 func (item *StorageItem) Save() error{
-	query := fmt.Sprintf(
-	`INSERT INTO %s (item_id, quantity, description)
-	VALUES ($1, $2, $3)`, item.Location)
-
-	fmt.Println(query)
+	query := 
+	`INSERT INTO inventory_gudang (item_id, quantity, description)
+	VALUES ($1, $2, $3)`
 
 	_, err := db.Conn.Query(context.Background(), query, item.ItemID, item.Quantity, item.Description)
+
+	if err != nil{
+		return err
+	}
+
+	query = 
+	`INSERT INTO inventory_tiktok (item_id, quantity, description)
+	VALUES ($1, 0, $2)`
+
+	_, err = db.Conn.Query(context.Background(), query, item.ItemID, item.Description)
+	
+	if err != nil {
+		return err
+	}
+
+	query = 
+	`INSERT INTO inventory_toko (item_id, quantity, description)
+	VALUES ($1, 0, $2)`
+
+	_, err = db.Conn.Query(context.Background(), query, item.ItemID, item.Description)
+	
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (item *Item) Create() error{
+	query := `
+	INSERT INTO items (item_id, description, price)
+	VALUES ($1, $2, $3)`
+
+	_, err := db.Conn.Exec(context.Background(), query, item.ItemID, item.Description, item.Price)
 
 	if err != nil{
 		return err

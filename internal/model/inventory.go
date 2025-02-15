@@ -46,7 +46,7 @@ func (item InventoryRequest) MoveItem() error{
 	destination_inventory_item.Quantity = item.Quantity
 	destination_inventory_item.ItemID = item.ItemID
 
-	err = destination_inventory_item.Save()
+	err = destination_inventory_item.UpdateItem()
 	if err !=nil{
 		fmt.Println(err)
 		return err

@@ -33,7 +33,7 @@ func insertItem(ctx *gin.Context){
 		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request data", nil)
 		return
 	}
-	item.Location = "inventory_gudang"
+
 	err = item.Save()
 
 	if err != nil{
@@ -43,6 +43,26 @@ func insertItem(ctx *gin.Context){
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "item inserted!", nil)
+}
+
+func createItem(ctx *gin.Context){
+	var item model.Item
+
+	err := ctx.ShouldBindJSON(&item)
+
+	if err != nil{
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request data", nil)
+		return
+	}
+
+	err = item.Create()
+	if err != nil{
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save item", nil)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
+
 }
 
 func updateItem(ctx *gin.Context){
