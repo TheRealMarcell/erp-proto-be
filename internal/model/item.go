@@ -108,12 +108,23 @@ func (item *Item) Create() error{
 	return nil
 }
 
-func (item *StorageItem) UpdateItem() error{
+func (item *StorageItem) UpdateItem(operation string) error{
+	qty, err := GetItemQty(item.ItemID, item.Location)
+	if err != nil{
+		return err
+	}
+
+	if (operation == "add"){
+		item.Quantity = item.Quantity + *qty
+	} else if (operation == "minus"){
+		item.Quantity = item.Quantity
+	}
+
 	query := fmt.Sprintf(`UPDATE %s
 	SET quantity = $1
 	WHERE item_id = $2`, item.Location)
 
-	_, err := db.Conn.Query(context.Background(), query, item.Quantity, item.ItemID)
+	_, err = db.Conn.Query(context.Background(), query, item.Quantity, item.ItemID)
 
 	if err != nil{
 		return err

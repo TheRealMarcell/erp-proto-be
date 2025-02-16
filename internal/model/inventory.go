@@ -34,7 +34,7 @@ func (item InventoryRequest) MoveItem() error{
 	source_inventory_item.Quantity = source_qty
 	source_inventory_item.ItemID = item.ItemID
 
-	err = source_inventory_item.UpdateItem()
+	err = source_inventory_item.UpdateItem("minus")
 	if err !=nil{
 		fmt.Println(err)
 		return err
@@ -46,7 +46,7 @@ func (item InventoryRequest) MoveItem() error{
 	destination_inventory_item.Quantity = item.Quantity
 	destination_inventory_item.ItemID = item.ItemID
 
-	err = destination_inventory_item.UpdateItem()
+	err = destination_inventory_item.UpdateItem("add")
 	if err !=nil{
 		fmt.Println(err)
 		return err

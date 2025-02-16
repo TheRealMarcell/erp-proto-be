@@ -80,7 +80,7 @@ func updateItem(ctx *gin.Context){
 	}
 
 
-	err = item.UpdateItem()
+	err = item.UpdateItem("add")
 	if err != nil{
 		fmt.Println(err)
 		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item", nil)
