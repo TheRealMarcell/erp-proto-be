@@ -14,9 +14,10 @@ func RegisterRoutes(server *gin.RouterGroup){
 	server.POST("/transactions", createTransaction)
 
 	server.GET("/items", getAllItems)
-	server.POST("/items", createItem)
 
-	server.POST("/items/:id", insertItem)
+	server.POST("/items", createItem)
+  // gabungin
+	server.POST("/items/:id", insertItem) // terima barang
 	server.PUT("/items/:id", updateItem) // retur barang
 
 	server.POST("/inventory/:id", moveItem)
