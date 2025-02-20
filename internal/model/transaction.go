@@ -1,7 +1,6 @@
 package model
 
 import (
-	"context"
 	db "erp-api/database"
 	"time"
 )
@@ -35,7 +34,7 @@ func GetTransactions() ([]TransactionResponse, error){
 	SELECT * FROM transactions
 	ORDER BY transaction_id`
 
-	rows, err := db.Conn.Query(context.Background(), query)
+	rows, err := db.DB.Query(query)
 	if err != nil{
 		return nil, err
 	}
@@ -64,13 +63,14 @@ func (tr *Transaction) Save() error {
 
 	currentTime := time.Now()
 
-	err := db.Conn.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
+	err := db.DB.QueryRow(query, tr.DiscountType, tr.DiscountPercent,
 	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime , tr.Location).Scan(&tr.TransactionID)
 
 	if err != nil{
 		return err
 	}
 
+	// save the sale associated with the transactions
 	for _, sale := range tr.Sales{
 		err := sale.Save(tr.TransactionID, tr.Location)
 
