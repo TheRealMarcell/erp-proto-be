@@ -14,7 +14,8 @@ type Transaction struct {
 	PaymentID int64						`json:"payment_id"`
 	CustomerName string				`json:"customer_name"`
 	Timestamp time.Time				`json:"timestamp"`
-	Location     string       		`json:"location"`
+	Location     string       `json:"location"`
+	PaymentStatus string			`json:"payment_status"`
 }
 
 // return type for transaction GET (no sale)
@@ -26,7 +27,8 @@ type TransactionResponse struct {
 	PaymentID int64						`json:"payment_id"`
 	CustomerName string				`json:"customer_name"`
 	Timestamp time.Time				`json:"timestamp"`
-	Location     string       		`json:"location"`
+	Location     string       `json:"location"`
+	PaymentStatus string			`json:"payment_status"`
 }
 
 func GetTransactions() ([]TransactionResponse, error){
@@ -44,7 +46,8 @@ func GetTransactions() ([]TransactionResponse, error){
 	for rows.Next(){
 		var tr TransactionResponse
 		err = rows.Scan(&tr.TransactionID, &tr.DiscountType, &tr.DiscountPercent,
-		&tr.TotalDiscount, &tr.PaymentID, &tr.CustomerName, &tr.Timestamp, &tr.Location)
+		&tr.TotalDiscount, &tr.PaymentID, &tr.CustomerName, &tr.Timestamp, &tr.Location,
+		&tr.PaymentStatus)
 
 		transactions = append(transactions, tr)
 	}
@@ -57,14 +60,14 @@ func GetTransactions() ([]TransactionResponse, error){
 
 func (tr *Transaction) Save() error {
 	query := `
-	INSERT INTO transactions (discount_type, discount_percent, total_discount, payment_id, customer_name, timestamp, location)
-	VALUES ($1, $2, $3, $4, $5, $6, $7)
+	INSERT INTO transactions (discount_type, discount_percent, total_discount, payment_id, customer_name, timestamp, location, payment_status)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 	RETURNING transaction_id`
 
 	currentTime := time.Now()
 
 	err := db.DB.QueryRow(query, tr.DiscountType, tr.DiscountPercent,
-	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime , tr.Location).Scan(&tr.TransactionID)
+	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime , tr.Location, tr.PaymentStatus).Scan(&tr.TransactionID)
 
 	if err != nil{
 		return err

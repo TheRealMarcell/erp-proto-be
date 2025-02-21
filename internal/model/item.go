@@ -122,22 +122,24 @@ func (item *Item) Create() error{
 }
 
 func (item *StorageItem) UpdateItem(operation string) error{
-	qty, err := GetItemQty(item.ItemID, item.Location)
-	if err != nil{
-		return err
-	}
-
 	if (operation == "add"){
-		item.Quantity = item.Quantity + *qty
-	}
+		qty, err := GetItemQty(item.ItemID, item.Location)
 
+		if err != nil{
+			return err
+		}
+
+		item.Quantity = item.Quantity + *qty
+	} else if (operation == "set"){
+		item.Location = "inventory_gudang"
+	}
 
 	query := 
-	`UPDATE inventory_gudang
+	fmt.Sprintf(`UPDATE %s
 	SET quantity = $1
-	WHERE item_id = $2`
+	WHERE item_id = $2`, item.Location)
 
-	_, err = db.DB.Query(query, item.Quantity, item.ItemID)
+	_, err := db.DB.Query(query, item.Quantity, item.ItemID)
 
 	if err != nil{
 		return err

@@ -23,8 +23,6 @@ func moveInventory(ctx *gin.Context){
 		inventory_item.Destination = inventory_request.Destination
 		inventory_item.Source = inventory_request.Source
 
-		fmt.Println(inventory_item)
-
 		err = inventory_item.MoveInventory()
 		if err != nil{
 			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
@@ -32,7 +30,7 @@ func moveInventory(ctx *gin.Context){
 		}
 	}
 
-	httpres.APIResponse(ctx, http.StatusOK, "successly moved", nil)
+	httpres.APIResponse(ctx, http.StatusOK, "successfully moved", nil)
 }
 
 func getInventory(ctx *gin.Context) {

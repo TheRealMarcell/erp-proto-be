@@ -136,6 +136,7 @@ func createTables(){
 			customer_name VARCHAR NULL,
 			timestamp TIMESTAMP WITHOUT TIME ZONE NULL,
 			location VARCHAR NULL,
+			payment_status VARCHAR NULL,
 			CONSTRAINT transactions_pkey PRIMARY KEY (transaction_id),
 			CONSTRAINT transactions_payment_id_fkey FOREIGN KEY (payment_id) 
 				REFERENCES public.payments (payment_id) ON DELETE SET NULL
