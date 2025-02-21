@@ -19,6 +19,19 @@ type StorageItem struct{
 	Description string		`json:"description"`
 }
 
+type ItemList struct{
+	Items []Item						`json:"items"`
+}
+
+type UpdateItemRequest struct {
+	Items []UpdateItemObject
+}
+
+type UpdateItemObject struct {
+	ItemID string				`json:"item_id"`
+	Quantity int64			`json:"quantity"`
+}
+
 func GetItems() ([]Item, error){
 	var items []Item
 
@@ -118,9 +131,11 @@ func (item *StorageItem) UpdateItem(operation string) error{
 		item.Quantity = item.Quantity + *qty
 	}
 
-	query := fmt.Sprintf(`UPDATE %s
+
+	query := 
+	`UPDATE inventory_gudang
 	SET quantity = $1
-	WHERE item_id = $2`, item.Location)
+	WHERE item_id = $2`
 
 	_, err = db.DB.Query(query, item.Quantity, item.ItemID)
 

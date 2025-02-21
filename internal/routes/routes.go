@@ -15,11 +15,11 @@ func RegisterRoutes(server *gin.RouterGroup){
 
 	server.GET("/items", getAllItems)
 
-	server.POST("/items", createItem)
+	server.POST("/items", createItem) // terima barang
+  server.PUT("/items", updateItem) // retur barang
 
-	server.POST("/items/:id", insertItem) // terima barang
-	server.PUT("/items/:id", updateItem) // retur barang
-
-	server.POST("/inventory/:id", moveItem)
+  server.POST("/inventory", moveInventory)  // pindahan
 	server.GET("/inventory/:location", getInventory)
+
+	server.POST("/items/:id", insertItem) // THIS IS DEFUNCT
 }

@@ -6,10 +6,17 @@ import (
 )
 
 type InventoryRequest struct {
+	Source string										`json:"source"`
+	Destination string							`json:"destination"`
+	Items []InventoryMoveItem				`json:"items"`
+}
+
+type InventoryMoveItem struct {
 	Source string							`json:"source"`
 	Destination string				`json:"destination"`
 	StorageItem
 }
+
 
 type InventoryItem struct {
 	ItemID string 					`json:"item_id"`
@@ -18,7 +25,7 @@ type InventoryItem struct {
 	Price int64							`json:"price"`
 }
 
-func (item InventoryRequest) MoveItem() error{
+func (item InventoryMoveItem) MoveInventory() error{
 	qty, err := GetItemQty(item.ItemID, item.Source)
 
 	if err != nil{

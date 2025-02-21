@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
 	"erp-api/internal/model"
 	"erp-api/util/httpres"
 	"fmt"
@@ -10,24 +9,27 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func moveItem(ctx *gin.Context){
-	id := ctx.Param("id")
+func moveInventory(ctx *gin.Context){
+	var inventory_request model.InventoryRequest
 
-	var inventory_move model.InventoryRequest
-
-	err := json.NewDecoder(ctx.Request.Body).Decode(&inventory_move)
-
+	err := ctx.ShouldBindJSON(&inventory_request)
 	if err != nil{
 		fmt.Println(err)
 		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", nil)
 		return
 	}
-	inventory_move.ItemID = id
 
-	err = inventory_move.MoveItem()
-	if err != nil{
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
-		return
+	for _, inventory_item := range inventory_request.Items {
+		inventory_item.Destination = inventory_request.Destination
+		inventory_item.Source = inventory_request.Source
+
+		fmt.Println(inventory_item)
+
+		err = inventory_item.MoveInventory()
+		if err != nil{
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
+			return
+		}
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "successly moved", nil)

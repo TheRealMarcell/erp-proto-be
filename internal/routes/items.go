@@ -47,48 +47,9 @@ func insertItem(ctx *gin.Context){
 }
 
 func createItem(ctx *gin.Context){
-	var item model.Item
+	var itemreq model.ItemList
 
-	err := ctx.ShouldBindJSON(&item)
-
-
-	if err != nil{
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request data", nil)
-		return
-	}
-
-	err = item.Create()
-
-	if err != nil{
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse save item", nil)
-		return
-	}
-
-	var storageitem model.StorageItem
-	storageitem.ItemID = item.ItemID
-	storageitem.Description = item.Description
-	storageitem.Location = "inventory_gudang"
-	storageitem.Quantity = item.Quantity
-
-	err = storageitem.Save()
-
-	if err != nil{
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save item", nil)
-		return
-	}
-
-	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
-
-}
-
-func updateItem(ctx *gin.Context){
-	id := ctx.Param("id")
-
-	var item model.StorageItem
-
-	err := json.NewDecoder(ctx.Request.Body).Decode(&item)
-	item.ItemID = id
+	err := ctx.ShouldBindJSON(&itemreq)
 
 	if err != nil{
 		fmt.Println(err)
@@ -96,14 +57,58 @@ func updateItem(ctx *gin.Context){
 		return
 	}
 
+	for _, item := range itemreq.Items{
+		err = item.Create()
 
-	err = item.UpdateItem("add")
-	if err != nil{
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item", nil)
-		return
+		if err != nil{
+			fmt.Println(err)
+			httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse save item", nil)
+			return
+		}
+	
+		var storageitem model.StorageItem
+		storageitem.ItemID = item.ItemID
+		storageitem.Description = item.Description
+		storageitem.Location = "inventory_gudang"
+		storageitem.Quantity = item.Quantity
+	
+		err = storageitem.Save()
+	
+		if err != nil{
+			fmt.Println(err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save item", nil)
+			return
+		}
+
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
 
+}
+
+func updateItem(ctx *gin.Context){
+	var update_request model.UpdateItemRequest
+
+	err := ctx.ShouldBindJSON(&update_request)
+	if err != nil{
+		fmt.Println(err)
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", nil)
+		return
+	}
+
+	for _, item := range update_request.Items{
+		var storage_item model.StorageItem
+		storage_item.ItemID = item.ItemID
+		storage_item.Quantity = item.Quantity
+		storage_item.Location = "inventory_gudang"
+
+		err = storage_item.UpdateItem("add")
+		if err != nil{
+			fmt.Println(err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item", nil)
+			return
+		}	
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
 }
