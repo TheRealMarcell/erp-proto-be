@@ -2,6 +2,7 @@ package model
 
 import (
 	db "erp-api/database"
+	"fmt"
 	"time"
 )
 
@@ -98,5 +99,22 @@ func UpdatePaymentStatus(transaction_id string, payment_status string) error{
 	}
 
 	return nil
+}
 
+func GetDiscountPercent(transaction_id string) (int64, error){
+	query := `
+	SELECT discount_percent
+	FROM transactions
+	WHERE transaction_id = $1`
+
+	var discount int64
+
+	err := db.DB.QueryRow(query, transaction_id).Scan(&discount)
+	if err != nil{
+		return 0, err
+	}
+
+	fmt.Println(discount)
+
+	return discount, nil
 }
