@@ -73,6 +73,8 @@ func GetInventory(location string) ([]InventoryItem, error) {
 		inventoryTable = "inventory_tiktok"
 	case "gudang":
 		inventoryTable = "inventory_gudang"
+	case "rusak":
+		inventoryTable = "inventory_rusak"
 	default:
 		return nil, fmt.Errorf("invalid location: %s", location)
 	}
