@@ -30,6 +30,7 @@ type UpdateItemRequest struct {
 type UpdateItemObject struct {
 	ItemID string				`json:"item_id"`
 	Quantity int64			`json:"quantity"`
+	SaleID int64				`json:"sale_id"`
 }
 
 type BrokenItem struct {
@@ -212,6 +213,20 @@ func UpdatePrice(item_price ItemPriceRequest) error{
 	`
 
 	_, err := db.DB.Query(query, item_price.Price, item_price.ItemID)
+	if err != nil{
+		return err
+	}
+
+	return nil
+}
+
+func UpdateSaleReturQty(item_qty int64, sale_id int64) error {
+	query := `
+	UPDATE sales
+	SET quantity_retur = quantity_retur + $1
+	WHERE sale_id = $2`
+
+	_, err := db.DB.Query(query, item_qty, sale_id)
 	if err != nil{
 		return err
 	}

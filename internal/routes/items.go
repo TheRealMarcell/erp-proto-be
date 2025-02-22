@@ -108,6 +108,13 @@ func updateItem(ctx *gin.Context){
 			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item", nil)
 			return
 		}	
+
+		err = model.UpdateSaleReturQty(item.Quantity, item.SaleID)
+		if err != nil{
+			fmt.Println(err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update sale retur qty", nil)
+			return
+		}	
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "success", nil)

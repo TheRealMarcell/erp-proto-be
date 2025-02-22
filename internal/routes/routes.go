@@ -20,7 +20,7 @@ func RegisterRoutes(server *gin.RouterGroup){
 	server.POST("/items", createItem) // terima barang
   server.PUT("/items", updateItem) // retur barang
   server.PUT("items/:id", correctItem) // koreksi
-  server.PUT("items/rusak", brokenItem)
+  server.PUT("items/rusak", brokenItem) // retur barang rusak
 
   server.PUT("items/price", updateItemPrice)
 
