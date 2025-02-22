@@ -57,8 +57,8 @@ func (sale *Sale) Save(transaction_id int64, location string) error{
 	}
 
 	query := `INSERT INTO sales 
-	(item_id, description, quantity, price, total, discount_per_item, transaction_id)
-	VALUES ($1, $2, $3, $4, $5, $6, $7)`
+	(item_id, description, quantity, price, total, discount_per_item, quantity_retur, transaction_id)
+	VALUES ($1, $2, $3, $4, $5, $6, 0, $7)`
 
 	_, err = db.DB.Exec(query, sale.ItemID, sale.Description, 
 	sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, sale.TransactionID)
@@ -81,6 +81,8 @@ func UpdateInventory(itemID string, quantity int64, location string) error {
 		inventoryTable = "inventory_tiktok"
 	case "toko":
 		inventoryTable = "inventory_toko"
+	case "gudang":
+		inventoryTable = "inventory_gudang"
 	default:
 		return fmt.Errorf("invalid location: %s", location)
 	}

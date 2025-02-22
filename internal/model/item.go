@@ -32,6 +32,12 @@ type UpdateItemObject struct {
 	Quantity int64			`json:"quantity"`
 }
 
+type BrokenItemRequest struct {
+	ItemID string				`json:"item_id"`
+	Quantity int64			`json:"quantity"`
+	SaleID int64				`json:"sale_id"`
+}
+
 func GetItems() ([]Item, error){
 	var items []Item
 
@@ -104,6 +110,16 @@ func (item *StorageItem) Save() error{
 		return err
 	}
 
+	query = 
+	`INSERT INTO inventory_rusak (item_id, quantity, description)
+	VALUES ($1, 0, $2)`
+
+	_, err = db.DB.Query(query, item.ItemID, item.Description)
+	
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -146,4 +162,30 @@ func (item *StorageItem) UpdateItem(operation string) error{
 	}
 
 	return nil
+}
+
+func SaveBrokenItem(broken_item BrokenItemRequest) error {
+	query := `
+	UPDATE inventory_rusak
+	SET quantity = $1
+	WHERE item_id = $2
+	`
+
+	_, err := db.DB.Query(query, broken_item.Quantity, broken_item.ItemID)
+	if err != nil{
+		return err
+	}
+
+	query = `
+	UPDATE sales
+	SET quantity_retur = $1
+	WHERE sale_id = $2`
+
+	_, err = db.DB.Query(query, broken_item.Quantity, broken_item.SaleID)
+	if err != nil{
+		return err
+	}
+
+	return nil
+
 }
