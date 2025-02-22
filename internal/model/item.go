@@ -155,8 +155,6 @@ func (item *StorageItem) UpdateItem(operation string) error{
 		}
 
 		item.Quantity = item.Quantity + *qty
-	} else if (operation == "set"){
-		item.Location = "inventory_gudang"
 	}
 
 	query := 

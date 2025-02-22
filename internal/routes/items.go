@@ -128,7 +128,6 @@ func correctItem(ctx *gin.Context){
 		return
 	}
 
-
 	err = item.UpdateItem("set")
 	if err != nil{
 		fmt.Println(err)
