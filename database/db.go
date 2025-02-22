@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -14,10 +15,10 @@ var DB *sql.DB
 func InitDB(){
 	logger := configuration.Logger()
 	
-	// err := godotenv.Load()
-  // if err != nil {
-  //   logger.Fatal("Error loading .env file")
-  // }
+	err := godotenv.Load()
+  if err != nil {
+    logger.Fatal("Error loading .env file")
+  }
 
 	dbPass := os.Getenv("DB_PASS")
 	dbUser := os.Getenv("DB_USER")
