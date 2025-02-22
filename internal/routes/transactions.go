@@ -67,10 +67,9 @@ func updatePayment(ctx *gin.Context){
 }
 
 func getTransactionDiscount(ctx *gin.Context){
-	id := ctx.Param("id")
-
-	discount_percent, err := model.GetDiscountPercent(id)
+	discount_percent, err := model.GetDiscountPercentages()
 	if err != nil{
+		fmt.Println(err)
 		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not fetch discount percent", nil)
 		return
 	}

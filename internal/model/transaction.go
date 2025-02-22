@@ -2,7 +2,6 @@ package model
 
 import (
 	db "erp-api/database"
-	"fmt"
 	"time"
 )
 
@@ -30,6 +29,11 @@ type TransactionResponse struct {
 	Timestamp time.Time				`json:"timestamp"`
 	Location     string       `json:"location"`
 	PaymentStatus string			`json:"payment_status"`
+}
+
+type DiscountResponse struct {
+	TransactionID int64				`json:"transaction_id"`
+	DiscountPercent int64			`json:"discount_percent"`
 }
 
 func GetTransactions() ([]TransactionResponse, error){
@@ -101,20 +105,28 @@ func UpdatePaymentStatus(transaction_id string, payment_status string) error{
 	return nil
 }
 
-func GetDiscountPercent(transaction_id string) (int64, error){
+func GetDiscountPercentages() ([]DiscountResponse, error){
 	query := `
-	SELECT discount_percent
-	FROM transactions
-	WHERE transaction_id = $1`
+	SELECT transaction_id, discount_percent
+	FROM transactions`
 
-	var discount int64
-
-	err := db.DB.QueryRow(query, transaction_id).Scan(&discount)
+	rows, err := db.DB.Query(query)
 	if err != nil{
-		return 0, err
+		return nil, err
 	}
 
-	fmt.Println(discount)
+	defer rows.Close()
 
-	return discount, nil
+	var discounts []DiscountResponse
+
+	for rows.Next(){
+		var discount DiscountResponse
+		err = rows.Scan(&discount.TransactionID, &discount.DiscountPercent)
+		if err != nil{
+			return nil, err
+		}
+		discounts = append(discounts, discount)
+	}
+
+	return discounts, nil
 }
