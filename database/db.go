@@ -32,7 +32,7 @@ func InitDB(){
 
 	databaseUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", dbUser, dbPass, dbAddress, dbPort, dbName)
 
-	DB, err = sql.Open("postgres", databaseUrl)
+	DB, _ = sql.Open("postgres", databaseUrl)
 	if err != nil {
 		logger.Sugar().Fatalf("Failed to connect to the database: %v", err)
 	}

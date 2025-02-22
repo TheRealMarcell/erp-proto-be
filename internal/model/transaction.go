@@ -84,3 +84,19 @@ func (tr *Transaction) Save() error {
 
 	return nil
 }
+
+func UpdatePaymentStatus(transaction_id string, payment_status string) error{
+	query := `
+	UPDATE transactions
+	SET payment_status = $1
+	WHERE transaction_id = $2`
+
+
+	_, err := db.DB.Query(query, payment_status, transaction_id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}
