@@ -13,13 +13,14 @@ type Sale struct{
 	Price int64										`json:"price"`
 	Total int64										`json:"total"`
 	DiscountPerItem float64				`json:"discount_per_item"`
+	QuantityRetur int64						`json:"quantity_retur"`
 	TransactionID int64						`json:"transaction_id"`
 	Location string								`json:"location"`
 }
 
 func GetSales() ([] Sale, error){
 	query := `
-	SELECT sale_id, description, quantity, price, total, discount_per_item, transactions.transaction_id, item_id, location
+	SELECT sale_id, description, quantity, price, total, discount_per_item, quantity_retur, transactions.transaction_id, item_id, location
 	FROM sales INNER JOIN transactions on sales.transaction_id = transactions.transaction_id
 	ORDER BY sale_id
 	`
@@ -34,7 +35,8 @@ func GetSales() ([] Sale, error){
 	for rows.Next(){
 		var sale Sale
 		err = rows.Scan(&sale.SaleID, &sale.Description, &sale.Quantity,
-			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.TransactionID, &sale.ItemID, &sale.Location)
+			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.QuantityRetur,
+			&sale.TransactionID, &sale.ItemID, &sale.Location)
 		
 		sales = append(sales, sale)
 	}

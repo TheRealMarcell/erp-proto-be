@@ -21,6 +21,8 @@ func RegisterRoutes(server *gin.RouterGroup){
   server.PUT("items/:id", correctItem) // koreksi
   server.PUT("items/rusak", brokenItem)
 
+  server.PUT("items/price", updateItemPrice)
+
   server.POST("/inventory", moveInventory)  // pindahan
 	server.GET("/inventory/:location", getInventory)
 

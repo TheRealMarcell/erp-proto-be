@@ -150,11 +150,32 @@ func brokenItem(ctx *gin.Context){
 		return
 	}
 
-	err = model.SaveBrokenItem(broken_item)
+	for _, broken_item := range broken_item.Items{
+		err = model.SaveBrokenItem(broken_item)
+		if err != nil{
+			httpres.APIResponse(ctx, http.StatusBadRequest, "could not update database", nil)
+			return
+		}
+	}	
+
+	httpres.APIResponse(ctx, http.StatusOK, "successfully updated broken item", nil)
+}
+
+func updateItemPrice(ctx *gin.Context){
+	var item_request model.ItemPriceRequest
+
+	err := ctx.ShouldBindJSON(&item_request)
 	if err != nil{
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not update database", nil)
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", nil)
 		return
 	}
 
-	httpres.APIResponse(ctx, http.StatusOK, "successfully updated broken item", nil)
+	err = model.UpdatePrice(item_request)
+	if err != nil{
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update price", nil)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "successfully updated price", nil)
+
 }
