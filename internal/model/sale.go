@@ -122,11 +122,6 @@ func UpdateInventory(itemID string, quantity int64, location string) error {
 		return fmt.Errorf("database error: %v", err)
 	}
 
-	// rowsAffected := res.RowsAffected()
-	// if rowsAffected == 0 {
-	// 	return fmt.Errorf("insufficient stock for item: %s", itemID)
-	// }
-
 	fmt.Printf("Stock updated for %s in %s", itemID, inventoryTable)
 	return nil
 }

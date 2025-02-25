@@ -8,6 +8,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
+
+	db "erp-api/database"
 )
 
 
@@ -49,7 +52,8 @@ func insertItem(ctx *gin.Context){
 func createItem(ctx *gin.Context){
 	var itemreq model.ItemList
 
-	err := ctx.ShouldBindJSON(&itemreq)
+	decoder := json.NewDecoder(ctx.Request.Body)
+	err := decoder.Decode(&itemreq)
 
 	if err != nil{
 		fmt.Println(err)
@@ -57,29 +61,62 @@ func createItem(ctx *gin.Context){
 		return
 	}
 
-	for _, item := range itemreq.Items{
-		err = item.Create()
-
-		if err != nil{
-			fmt.Println(err)
-			httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse save item", nil)
+	tx, err := db.DB.Begin(ctx)
+	if err != nil {
+			fmt.Println("Transaction Error:", err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "failed to start transaction", nil)
 			return
-		}
+	}
+	defer tx.Rollback(ctx)
+
+	batch := &pgx.Batch{}
+	storageBatch := &pgx.Batch{}
+
+	for _, item := range itemreq.Items{
+		batch.Queue("INSERT INTO items (item_id, description, price) VALUES ($1, $2, $3)", 
+		item.ItemID, item.Description, item.Price)
 	
 		var storageitem model.StorageItem
 		storageitem.ItemID = item.ItemID
 		storageitem.Description = item.Description
 		storageitem.Location = "inventory_gudang"
 		storageitem.Quantity = item.Quantity
-	
-		err = storageitem.Save()
-	
-		if err != nil{
-			fmt.Println(err)
-			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save item", nil)
-			return
-		}
 
+		storageBatch.Queue("INSERT INTO inventory_gudang (item_id, quantity, description) VALUES ($1, $2, $3)", 
+		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+
+		storageBatch.Queue("INSERT INTO inventory_tiktok (item_id, quantity, description) VALUES ($1, $2, $3)", 
+		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+
+		storageBatch.Queue("INSERT INTO inventory_toko (item_id, quantity, description) VALUES ($1, $2, $3)", 
+		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+
+		storageBatch.Queue("INSERT INTO inventory_rusak (item_id, quantity, description) VALUES ($1, $2, $3)", 
+		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+	}
+
+	results := tx.SendBatch(ctx, batch)
+	err = results.Close()
+	if err != nil {
+			fmt.Println("Batch Insert Error:", err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save items", nil)
+			return
+	}
+
+
+	results = tx.SendBatch(ctx, storageBatch)
+	err = results.Close()
+	if err != nil {
+			fmt.Println("Storage Insert Error:", err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save storage items", nil)
+			return
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+			fmt.Println("Transaction Commit Error:", err)
+			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not commit transaction", nil)
+			return
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "success", nil)

@@ -3,7 +3,10 @@ package model
 import (
 	"context"
 	db "erp-api/database"
+	"fmt"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type Transaction struct {
@@ -65,6 +68,14 @@ func GetTransactions() ([]TransactionResponse, error){
 }
 
 func (tr *Transaction) Save() error {
+	ctx := context.Background()
+
+	tx, err := db.DB.Begin(ctx)
+	if err != nil {
+			return err
+	}
+	defer tx.Rollback(ctx) 
+
 	query := `
 	INSERT INTO transactions (discount_type, discount_percent, total_discount, payment_id, customer_name, timestamp, location, payment_status)
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
@@ -72,20 +83,40 @@ func (tr *Transaction) Save() error {
 
 	currentTime := time.Now()
 
-	err := db.DB.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
+	err = db.DB.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
 	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime , tr.Location, tr.PaymentStatus).Scan(&tr.TransactionID)
 
 	if err != nil{
 		return err
 	}
 
+	batch := &pgx.Batch{}
+
 	// save the sale associated with the transactions
 	for _, sale := range tr.Sales{
-		err := sale.Save(tr.TransactionID, tr.Location)
+		batch.Queue(`INSERT INTO sales (item_id, description, quantity, price, total, discount_per_item, quantity_retur, transaction_id) 
+		VALUES ($1, $2, $3, $4, $5, $6, 0, $7)`, sale.ItemID, sale.Description, 
+		sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, tr.TransactionID)
 
-		if err != nil{
+		formatted_location := fmt.Sprintf("inventory_%v", tr.Location)
+
+		updateQuery := fmt.Sprintf(`
+		UPDATE %s 
+		SET quantity = quantity - $1 
+		WHERE item_id = $2 AND quantity >= $1`, formatted_location)
+
+		batch.Queue(updateQuery, sale.Quantity, sale.ItemID)
+	}
+
+	results := tx.SendBatch(ctx, batch)
+	err = results.Close()
+	if err != nil {
 			return err
-		}
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+			return err
 	}
 
 	return nil

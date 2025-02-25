@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/joho/godotenv"
 )
 
 var DB *pgxpool.Pool
@@ -15,10 +14,10 @@ var DB *pgxpool.Pool
 func InitDB(){
 	logger := configuration.Logger()
 	
-	err := godotenv.Load()
-  if err != nil {
-    logger.Fatal("Error loading .env file")
-  }
+	// err := godotenv.Load()
+  // if err != nil {
+  //   logger.Fatal("Error loading .env file")
+  // }
 
 	dbPass := os.Getenv("DB_PASS")
 	dbUser := os.Getenv("DB_USER")
@@ -34,6 +33,10 @@ func InitDB(){
 
 	config, err := pgxpool.ParseConfig(databaseUrl)
 
+	if err != nil{
+		logger.Fatal("Failed to parse config")
+	}
+
 	config.MaxConns = 10  
 	config.MinConns = 5 
 
@@ -41,7 +44,6 @@ func InitDB(){
 	if err != nil {
 		logger.Fatal("Failed to create connection pool")
 	}
-	defer DB.Close()
 
 	logger.Sugar().Infof("Connected to database at URL: %v", databaseUrl)
 
