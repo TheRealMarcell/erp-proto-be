@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	db "erp-api/database"
 	"fmt"
 )
@@ -25,7 +26,7 @@ func GetSales() ([] Sale, error){
 	ORDER BY sale_id
 	`
 
-	rows, err := db.DB.Query(query)
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil{
 		return nil, err
 	}
@@ -62,7 +63,7 @@ func (sale *Sale) Save(transaction_id int64, location string) error{
 	(item_id, description, quantity, price, total, discount_per_item, quantity_retur, transaction_id)
 	VALUES ($1, $2, $3, $4, $5, $6, 0, $7)`
 
-	_, err = db.DB.Exec(query, sale.ItemID, sale.Description, 
+	_, err = db.DB.Exec(context.Background(), query, sale.ItemID, sale.Description, 
 	sale.Quantity, sale.Price, sale.Total, sale.DiscountPerItem, sale.TransactionID)
 
 	if err != nil{
@@ -98,7 +99,7 @@ func UpdateInventory(itemID string, quantity int64, location string) error {
 		WHERE item_id = $1
 		`, inventoryTable)
 
-		err := db.DB.QueryRow(query, itemID).Scan(&stock)
+		err := db.DB.QueryRow(context.Background(), query, itemID).Scan(&stock)
 
 		if err != nil{
 			return err
@@ -116,15 +117,10 @@ func UpdateInventory(itemID string, quantity int64, location string) error {
 		SET quantity = quantity - $1 
 		WHERE item_id = $2 AND quantity >= $1`, inventoryTable)
 
-	_, err = db.DB.Exec(query, quantity, itemID)
+	_, err = db.DB.Exec(context.Background(), query, quantity, itemID)
 	if err != nil {
 		return fmt.Errorf("database error: %v", err)
 	}
-
-	// rowsAffected := res.RowsAffected()
-	// if rowsAffected == 0 {
-	// 	return fmt.Errorf("insufficient stock for item: %s", itemID)
-	// }
 
 	fmt.Printf("Stock updated for %s in %s", itemID, inventoryTable)
 	return nil

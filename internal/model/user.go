@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	db "erp-api/database"
 	"errors"
 )
@@ -26,7 +27,7 @@ func GetUser(userReq UserRequest) (*User, error){
 	WHERE username=$1
 	`
 
-	row := db.DB.QueryRow(userQuery, userReq.Username)
+	row := db.DB.QueryRow(context.Background(), userQuery, userReq.Username)
 
 	var user User
 	err := row.Scan(&user.UserID, &user.Username, &user.Password, &user.Role)

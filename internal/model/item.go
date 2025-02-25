@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	db "erp-api/database"
 	"fmt"
 )
@@ -56,7 +57,7 @@ func GetItems() ([]Item, error){
 		FROM items
 	`
 
-	rows, err := db.DB.Query(query)
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +82,7 @@ func GetItemQty(item_id string, location string) (*int64, error){
 	FROM %s
 	WHERE item_id = $1`, location)
 
-	err := db.DB.QueryRow(query, item_id).Scan(&item_qty)
+	err := db.DB.QueryRow(context.Background(), query, item_id).Scan(&item_qty)
 	if err != nil{
 		return nil, err
 	}
@@ -94,7 +95,7 @@ func (item *StorageItem) Save() error{
 	`INSERT INTO inventory_gudang (item_id, quantity, description)
 	VALUES ($1, $2, $3)`
 
-	_, err := db.DB.Query(query, item.ItemID, item.Quantity, item.Description)
+	_, err := db.DB.Query(context.Background(), query, item.ItemID, item.Quantity, item.Description)
 
 	if err != nil{
 		return err
@@ -104,7 +105,7 @@ func (item *StorageItem) Save() error{
 	`INSERT INTO inventory_tiktok (item_id, quantity, description)
 	VALUES ($1, 0, $2)`
 
-	_, err = db.DB.Query(query, item.ItemID, item.Description)
+	_, err = db.DB.Query(context.Background(), query, item.ItemID, item.Description)
 	
 	if err != nil {
 		return err
@@ -114,7 +115,7 @@ func (item *StorageItem) Save() error{
 	`INSERT INTO inventory_toko (item_id, quantity, description)
 	VALUES ($1, 0, $2)`
 
-	_, err = db.DB.Query(query, item.ItemID, item.Description)
+	_, err = db.DB.Query(context.Background(), query, item.ItemID, item.Description)
 	
 	if err != nil {
 		return err
@@ -124,7 +125,7 @@ func (item *StorageItem) Save() error{
 	`INSERT INTO inventory_rusak (item_id, quantity, description)
 	VALUES ($1, 0, $2)`
 
-	_, err = db.DB.Query(query, item.ItemID, item.Description)
+	_, err = db.DB.Query(context.Background(), query, item.ItemID, item.Description)
 	
 	if err != nil {
 		return err
@@ -138,7 +139,7 @@ func (item *Item) Create() error{
 	INSERT INTO items (item_id, description, price)
 	VALUES ($1, $2, $3)`
 
-	_, err := db.DB.Exec(query, item.ItemID, item.Description, item.Price)
+	_, err := db.DB.Exec(context.Background(), query, item.ItemID, item.Description, item.Price)
 
 	if err != nil{
 		return err
@@ -163,7 +164,7 @@ func (item *StorageItem) UpdateItem(operation string) error{
 	SET quantity = $1
 	WHERE item_id = $2`, item.Location)
 
-	_, err := db.DB.Query(query, item.Quantity, item.ItemID)
+	_, err := db.DB.Query(context.Background(), query, item.Quantity, item.ItemID)
 
 	if err != nil{
 		return err
@@ -186,7 +187,7 @@ func SaveBrokenItem(broken_item BrokenItem) error {
 	WHERE item_id = $2
 	`
 
-	_, err = db.DB.Query(query, new_quantity, broken_item.ItemID)
+	_, err = db.DB.Query(context.Background(), query, new_quantity, broken_item.ItemID)
 	if err != nil{
 		return err
 	}
@@ -196,7 +197,7 @@ func SaveBrokenItem(broken_item BrokenItem) error {
 	SET quantity_retur = quantity_retur + $1
 	WHERE sale_id = $2`
 
-	_, err = db.DB.Query(query, broken_item.Quantity, broken_item.SaleID)
+	_, err = db.DB.Query(context.Background(), query, broken_item.Quantity, broken_item.SaleID)
 	if err != nil{
 		return err
 	}
@@ -212,7 +213,7 @@ func UpdatePrice(item_price ItemPriceRequest) error{
 	WHERE item_id = $2
 	`
 
-	_, err := db.DB.Query(query, item_price.Price, item_price.ItemID)
+	_, err := db.DB.Query(context.Background(), query, item_price.Price, item_price.ItemID)
 	if err != nil{
 		return err
 	}
@@ -226,7 +227,7 @@ func UpdateSaleReturQty(item_qty int64, sale_id int64) error {
 	SET quantity_retur = quantity_retur + $1
 	WHERE sale_id = $2`
 
-	_, err := db.DB.Query(query, item_qty, sale_id)
+	_, err := db.DB.Query(context.Background(), query, item_qty, sale_id)
 	if err != nil{
 		return err
 	}

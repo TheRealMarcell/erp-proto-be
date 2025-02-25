@@ -4,6 +4,9 @@ import (
 	db "erp-api/database"
 	docs "erp-api/docs"
 	"erp-api/internal/routes"
+	"log"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
@@ -34,6 +37,8 @@ func setupRouter() *gin.Engine {
 func main() {
 	db.InitDB()
 
+	defer db.DB.Close()
+
 	docs.SwaggerInfo.Title = "Sandbox API - IDP BR Service"	
 	docs.SwaggerInfo.Description = "This is a sandbox API for IDP BR service used for development purposes"		
 	docs.SwaggerInfo.Version = "1.1"	
@@ -47,5 +52,15 @@ func main() {
 	
 	apiRoutes := server.Group("/api")
 	routes.RegisterRoutes(apiRoutes)
-	server.Run(":8080")
+	httpServer := &http.Server{
+    Addr:         ":8080",
+    Handler:      server, 
+    ReadTimeout:  120 * time.Second, 
+    WriteTimeout: 120 * time.Second, 
+    IdleTimeout:  120 * time.Second,
+    MaxHeaderBytes: 1 << 20, 
+}
+
+	log.Fatal(httpServer.ListenAndServe()) 
+
 }
