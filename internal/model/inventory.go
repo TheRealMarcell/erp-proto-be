@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	db "erp-api/database"
 	"fmt"
 )
@@ -85,7 +86,7 @@ func GetInventory(location string) ([]InventoryItem, error) {
 	INNER JOIN items ON i.item_id = items.item_id
 	`, inventoryTable)
 
-	rows, err := db.DB.Query(query)
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil {
 		return nil, err
 	}

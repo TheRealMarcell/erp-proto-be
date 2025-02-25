@@ -1,23 +1,24 @@
 package database
 
 import (
-	"database/sql"
+	"context"
 	"erp-api/util/configuration"
 	"fmt"
 	"os"
 
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
 )
 
-var DB *sql.DB
+var DB *pgxpool.Pool
 
 func InitDB(){
 	logger := configuration.Logger()
 	
-	// err := godotenv.Load()
-  // if err != nil {
-  //   logger.Fatal("Error loading .env file")
-  // }
+	err := godotenv.Load()
+  if err != nil {
+    logger.Fatal("Error loading .env file")
+  }
 
 	dbPass := os.Getenv("DB_PASS")
 	dbUser := os.Getenv("DB_USER")
@@ -31,10 +32,16 @@ func InitDB(){
 
 	databaseUrl := fmt.Sprintf("postgres://%v:%v@%v:%v/%v?sslmode=disable", dbUser, dbPass, dbAddress, dbPort, dbName)
 
-	DB, _ = sql.Open("postgres", databaseUrl)
+	config, err := pgxpool.ParseConfig(databaseUrl)
 
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(5)
+	config.MaxConns = 10  
+	config.MinConns = 5 
+
+	DB, err = pgxpool.NewWithConfig(context.Background(), config)
+	if err != nil {
+		logger.Fatal("Failed to create connection pool")
+	}
+	defer DB.Close()
 
 	logger.Sugar().Infof("Connected to database at URL: %v", databaseUrl)
 
@@ -51,7 +58,7 @@ func createTables(){
 		);
 	`
 
-	_, err := DB.Exec(createTableQuery)
+	_, err := DB.Exec(context.Background(), createTableQuery)
 
 	if err != nil {
 		panic(err)
@@ -68,7 +75,7 @@ func createTables(){
 				FOREIGN KEY (item_id) REFERENCES items (item_id)
 		);
 	`
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 
 	if err != nil {
 		panic(err)
@@ -86,7 +93,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	
 	if err != nil {
 		panic(err)
@@ -104,7 +111,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -117,7 +124,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -133,7 +140,7 @@ func createTables(){
 		ON CONFLICT (payment_id) DO NOTHING;
 	`
 
-	_, err = DB.Exec(insertPaymentsQuery)
+	_, err = DB.Exec(context.Background(), insertPaymentsQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -156,7 +163,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -180,7 +187,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -195,7 +202,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -206,7 +213,7 @@ func createTables(){
 		ON CONFLICT (user_id) DO NOTHING;
 	`
 
-	_, err = DB.Exec(insertUserQuery)
+	_, err = DB.Exec(context.Background(), insertUserQuery)
 	if err != nil {
 		panic(err)
 	}
@@ -223,7 +230,7 @@ func createTables(){
 		);
 	`
 
-	_, err = DB.Exec(createTableQuery)
+	_, err = DB.Exec(context.Background(), createTableQuery)
 	if err != nil{
 		panic(err)
 	}

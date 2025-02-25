@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	db "erp-api/database"
 	"time"
 )
@@ -41,7 +42,7 @@ func GetTransactions() ([]TransactionResponse, error){
 	SELECT * FROM transactions
 	ORDER BY transaction_id`
 
-	rows, err := db.DB.Query(query)
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil{
 		return nil, err
 	}
@@ -71,7 +72,7 @@ func (tr *Transaction) Save() error {
 
 	currentTime := time.Now()
 
-	err := db.DB.QueryRow(query, tr.DiscountType, tr.DiscountPercent,
+	err := db.DB.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
 	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime , tr.Location, tr.PaymentStatus).Scan(&tr.TransactionID)
 
 	if err != nil{
@@ -97,7 +98,7 @@ func UpdatePaymentStatus(transaction_id string, payment_status string) error{
 	WHERE transaction_id = $2`
 
 
-	_, err := db.DB.Query(query, payment_status, transaction_id)
+	_, err := db.DB.Query(context.Background(), query, payment_status, transaction_id)
 	if err != nil {
 		return err
 	}
@@ -110,7 +111,7 @@ func GetDiscountPercentages() ([]DiscountResponse, error){
 	SELECT transaction_id, discount_percent
 	FROM transactions`
 
-	rows, err := db.DB.Query(query)
+	rows, err := db.DB.Query(context.Background(), query)
 	if err != nil{
 		return nil, err
 	}
