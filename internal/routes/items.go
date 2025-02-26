@@ -86,13 +86,13 @@ func createItem(ctx *gin.Context){
 		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
 
 		storageBatch.Queue("INSERT INTO inventory_tiktok (item_id, quantity, description) VALUES ($1, $2, $3)", 
-		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+		storageitem.ItemID, 0, storageitem.Description)
 
 		storageBatch.Queue("INSERT INTO inventory_toko (item_id, quantity, description) VALUES ($1, $2, $3)", 
-		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+		storageitem.ItemID, 0, storageitem.Description)
 
 		storageBatch.Queue("INSERT INTO inventory_rusak (item_id, quantity, description) VALUES ($1, $2, $3)", 
-		storageitem.ItemID, storageitem.Quantity, storageitem.Description)
+		storageitem.ItemID, 0, storageitem.Description)
 	}
 
 	results := tx.SendBatch(ctx, batch)
