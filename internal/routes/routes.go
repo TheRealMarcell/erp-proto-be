@@ -24,8 +24,8 @@ func RegisterRoutes(server *gin.RouterGroup){
 
   server.PUT("items/price", updateItemPrice)
 
-  server.POST("/inventory", moveInventory)  // pindahan
-	server.GET("/inventory/:location", getInventory)
+  // server.POST("/inventory", moveInventory)  // pindahan
+	// server.GET("/inventory/:location", getInventory)
 
 	server.POST("/items/:id", insertItem) // THIS IS DEFUNCT
 }

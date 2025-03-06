@@ -18,7 +18,6 @@ type InventoryMoveItem struct {
 	StorageItem
 }
 
-
 type InventoryItem struct {
 	ItemID string 					`json:"item_id"`
 	Quantity int64 				 	`json:"quantity"`

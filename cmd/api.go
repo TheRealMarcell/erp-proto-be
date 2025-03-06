@@ -3,10 +3,17 @@ package main
 import (
 	db "erp-api/database"
 	docs "erp-api/docs"
-	"erp-api/internal/routes"
-	"log"
+	"erp-api/internal/pkg/log"
 	"net/http"
 	"time"
+
+	"erp-api/internal/routes"
+	"erp-api/util/configuration"
+
+	inventoryHandler "erp-api/internal/modules/inventory/handlers"
+	inventoryRepoQuery "erp-api/internal/modules/inventory/repositories/queries"
+
+	inventoryUseCase "erp-api/internal/modules/inventory/usecases"
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
@@ -35,7 +42,11 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	db.InitDB()
+	logger := configuration.Logger()
+
+	logger_log := log.GetLogger()
+	
+	db.InitDB(*logger)
 
 	defer db.DB.Close()
 
@@ -52,6 +63,13 @@ func main() {
 	
 	apiRoutes := server.Group("/api")
 	routes.RegisterRoutes(apiRoutes)
+
+	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+
+	inventoryUseCase := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger_log)
+
+	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCase, logger_log)
+
 	httpServer := &http.Server{
     Addr:         ":8080",
     Handler:      server, 
@@ -59,8 +77,7 @@ func main() {
     WriteTimeout: 120 * time.Second, 
     IdleTimeout:  120 * time.Second,
     MaxHeaderBytes: 1 << 20, 
-}
+	}
 
-	log.Fatal(httpServer.ListenAndServe()) 
-
+	httpServer.ListenAndServe();
 }

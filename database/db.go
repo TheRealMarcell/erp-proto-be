@@ -2,22 +2,22 @@ package database
 
 import (
 	"context"
-	"erp-api/util/configuration"
 	"fmt"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/joho/godotenv"
+	"go.uber.org/zap"
 )
 
 var DB *pgxpool.Pool
 
-func InitDB(){
-	logger := configuration.Logger()
+func InitDB(logger zap.Logger){
 	
-	// err := godotenv.Load()
-  // if err != nil {
-  //   logger.Fatal("Error loading .env file")
-  // }
+	err := godotenv.Load()
+  if err != nil {
+    logger.Fatal("Error loading .env file")
+  }
 
 	dbPass := os.Getenv("DB_PASS")
 	dbUser := os.Getenv("DB_USER")
