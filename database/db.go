@@ -1,3 +1,6 @@
+//go:build !docker
+// +build !docker
+
 package database
 
 import (
@@ -13,7 +16,6 @@ import (
 var DB *pgxpool.Pool
 
 func InitDB(logger zap.Logger){
-	
 	err := godotenv.Load()
   if err != nil {
     logger.Fatal("Error loading .env file")
@@ -154,6 +156,7 @@ func createTables(){
 			discount_type VARCHAR NULL,
 			discount_percent SMALLINT NULL,
 			total_discount BIGINT NULL,
+			total_price BIGINT NULL,
 			payment_id BIGINT NULL,
 			customer_name VARCHAR NULL,
 			timestamp TIMESTAMP WITHOUT TIME ZONE NULL,

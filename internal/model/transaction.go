@@ -15,6 +15,7 @@ type Transaction struct {
 	DiscountType string				`json:"discount_type"`
 	DiscountPercent int64			`json:"discount_percent"`
 	TotalDiscount int64				`json:"total_discount"`
+	TotalPrice int64					`json:"total_price"`
 	PaymentID int64						`json:"payment_id"`
 	CustomerName string				`json:"customer_name"`
 	Timestamp time.Time				`json:"timestamp"`
@@ -77,14 +78,14 @@ func (tr *Transaction) Save() error {
 	defer tx.Rollback(ctx) 
 
 	query := `
-	INSERT INTO transactions (discount_type, discount_percent, total_discount, payment_id, customer_name, timestamp, location, payment_status)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+	INSERT INTO transactions (discount_type, discount_percent, total_price, total_discount, payment_id, customer_name, timestamp, location, payment_status)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 	RETURNING transaction_id`
 
 	currentTime := time.Now()
 
 	err = db.DB.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
-	tr.TotalDiscount, tr.PaymentID, tr.CustomerName, currentTime , tr.Location, tr.PaymentStatus).Scan(&tr.TransactionID)
+	tr.TotalDiscount, tr.TotalPrice, tr.PaymentID, tr.CustomerName, currentTime , tr.Location, tr.PaymentStatus).Scan(&tr.TransactionID)
 
 	if err != nil{
 		return err

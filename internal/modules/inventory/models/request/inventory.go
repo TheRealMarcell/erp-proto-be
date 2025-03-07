@@ -9,7 +9,7 @@ type InventoryMoveItemRequest struct {
 	Description string		`json:"description"`
 }
 
-type GetInventoryRequest struct {
+type MoveInventoryRequest struct {
 	Source string														`json:"source"`
 	Destination string											`json:"destination"`
 	Items []InventoryMoveItemRequest				`json:"items"`

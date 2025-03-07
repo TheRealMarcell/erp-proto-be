@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"erp-api/internal/modules/inventory"
-	"erp-api/internal/pkg/helpers"
+	"erp-api/internal/modules/inventory/models/request"
 	"erp-api/internal/pkg/log"
 	"erp-api/util/httpres"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -33,7 +34,13 @@ func InitInventoryHttpHandler(app *gin.Engine, auq inventory.UsecaseQuery, log l
 
 
 func (i InventoryHttpHandler) MoveInventory(ctx *gin.Context){
-	// req := new(request.InventoryMoveItemRequest)
+  req := new(request.MoveInventoryRequest)
+  if err := ctx.ShouldBindJSON(req); err != nil{
+    httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
+    return
+  }
+
+	httpres.APIResponse(ctx, http.StatusOK, "test", nil)
 }
 
 func (i InventoryHttpHandler) GetInventory(ctx *gin.Context){
@@ -41,7 +48,8 @@ func (i InventoryHttpHandler) GetInventory(ctx *gin.Context){
 
 	resp, err := i.InventoryUsecaseQuery.GetInventory(ctx, location)
 	if err != nil {
-		helpers.RespCustomError(ctx, i.Logger, err)
+    msg := fmt.Sprintf("could not get items in inventory %v", location)
+    httpres.APIResponse(ctx, http.StatusInternalServerError, msg, nil)
 		return
 	}
 
