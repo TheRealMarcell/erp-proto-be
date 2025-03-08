@@ -55,7 +55,7 @@ func GetTransactions() ([]TransactionResponse, error){
 
 	for rows.Next(){
 		var tr TransactionResponse
-		err = rows.Scan(&tr.TransactionID, &tr.DiscountType, &tr.DiscountPercent,
+		err = rows.Scan(&tr.TransactionID, &tr.DiscountType, &tr.DiscountPercent, &tr.TotalDiscount,
 		&tr.TotalDiscount, &tr.PaymentID, &tr.CustomerName, &tr.Timestamp, &tr.Location,
 		&tr.PaymentStatus)
 
