@@ -29,6 +29,7 @@ type TransactionResponse struct {
 	DiscountType string				`json:"discount_type"`
 	DiscountPercent int64			`json:"discount_percent"`
 	TotalDiscount int64				`json:"total_discount"`
+	TotalPrice int64					`json:"total_price"`
 	PaymentID int64						`json:"payment_id"`
 	CustomerName string				`json:"customer_name"`
 	Timestamp time.Time				`json:"timestamp"`
@@ -55,7 +56,7 @@ func GetTransactions() ([]TransactionResponse, error){
 
 	for rows.Next(){
 		var tr TransactionResponse
-		err = rows.Scan(&tr.TransactionID, &tr.DiscountType, &tr.DiscountPercent, &tr.TotalDiscount,
+		err = rows.Scan(&tr.TransactionID, &tr.DiscountType, &tr.DiscountPercent, &tr.TotalPrice,
 		&tr.TotalDiscount, &tr.PaymentID, &tr.CustomerName, &tr.Timestamp, &tr.Location,
 		&tr.PaymentStatus)
 
