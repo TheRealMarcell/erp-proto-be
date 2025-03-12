@@ -49,30 +49,6 @@ type ItemPriceRequest struct {
 	Price int64					`json:"price"`
 }
 
-func GetItems() ([]Item, error){
-	var items []Item
-
-	query := `
-		SELECT * 
-		FROM items
-	`
-
-	rows, err := db.DB.Query(context.Background(), query)
-	if err != nil {
-		return nil, err
-	}
-
-	for rows.Next(){
-		var item Item
-		err = rows.Scan(&item.ItemID, &item.Price, &item.Description)
-		if err != nil{
-			return nil, err
-		}
-		items = append(items, item)
-	}
-
-	return items, nil
-}
 
 func GetItemQty(item_id string, location string) (*int64, error){
 	var item_qty int64

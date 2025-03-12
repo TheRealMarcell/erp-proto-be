@@ -19,36 +19,6 @@ type Sale struct{
 	Location string								`json:"location"`
 }
 
-func GetSales() ([] Sale, error){
-	query := `
-	SELECT sale_id, description, quantity, price, total, discount_per_item, quantity_retur, transactions.transaction_id, item_id, location
-	FROM sales INNER JOIN transactions on sales.transaction_id = transactions.transaction_id
-	ORDER BY sale_id
-	`
-
-	rows, err := db.DB.Query(context.Background(), query)
-	if err != nil{
-		return nil, err
-	}
-
-	var sales []Sale
-
-	for rows.Next(){
-		var sale Sale
-		err = rows.Scan(&sale.SaleID, &sale.Description, &sale.Quantity,
-			&sale.Price, &sale.Total, &sale.DiscountPerItem, &sale.QuantityRetur,
-			&sale.TransactionID, &sale.ItemID, &sale.Location)
-		
-		sales = append(sales, sale)
-	}
-
-	if err != nil{
-		return nil, err
-	}
-
-	return sales, nil
-}
-
 func (sale *Sale) Save(transaction_id int64, location string) error{
 	fmt.Println(transaction_id)
 	sale.TransactionID = transaction_id

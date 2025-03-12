@@ -17,13 +17,13 @@ type queryPostgresRepository struct {
 }
 
 func NewQueryPostgresRepository(postgres *pgxpool.Pool, log log.Logger) inventory.PostgresRepositoryQuery{
-	return &queryPostgresRepository{
+	return &queryPostgresRepository{ 
 		postgres: postgres,
 		logger: log,
 	}
 }
 
-func (c queryPostgresRepository) GetInventory(ctx context.Context, location string) <-chan wrapper.Result{
+func (c queryPostgresRepository) FindListInventory(ctx context.Context, location string) <-chan wrapper.Result{
 	output := make(chan wrapper.Result)
 
 	var inventoryTable string

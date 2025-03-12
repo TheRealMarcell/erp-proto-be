@@ -2,18 +2,18 @@ package routes
 
 import (
 	"erp-api/internal/model"
-	"erp-api/util/httpres"
+	"erp-api/internal/pkg/util/httpres"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func moveInventory(ctx *gin.Context){
+func moveInventory(ctx *gin.Context) {
 	var inventory_request model.InventoryRequest
 
 	err := ctx.ShouldBindJSON(&inventory_request)
-	if err != nil{
+	if err != nil {
 		fmt.Println(err)
 		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", nil)
 		return
@@ -24,7 +24,7 @@ func moveInventory(ctx *gin.Context){
 		inventory_item.Source = inventory_request.Source
 
 		err = inventory_item.MoveInventory()
-		if err != nil{
+		if err != nil {
 			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
 			return
 		}

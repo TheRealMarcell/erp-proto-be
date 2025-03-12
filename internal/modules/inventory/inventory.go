@@ -15,7 +15,7 @@ type UsecaseCommand interface {
 }
 
 type PostgresRepositoryQuery interface {
-	GetInventory(ctx context.Context, location string) <-chan wrapper.Result
+	FindListInventory(ctx context.Context, location string) <-chan wrapper.Result
 }
 
 type PostgresRepositoryCommand interface {
