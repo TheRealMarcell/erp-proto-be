@@ -33,15 +33,16 @@ func (q queryPostgresRepository) FindAllSales(ctx context.Context) <-chan wrappe
 	ORDER BY sale_id
 	`
 
+	var sales []entity.Sale
+
 	go func() {
 		defer close(output)
-		rows, err := q.postgres.Query(context.Background(), query)
+
+		rows, err := q.postgres.Query(ctx, query)
 		if err != nil {
 			output <- wrapper.Result{Error: err}
 			return
 		}
-
-		var sales []entity.Sale
 
 		for rows.Next() {
 			var sale entity.Sale
@@ -55,9 +56,10 @@ func (q queryPostgresRepository) FindAllSales(ctx context.Context) <-chan wrappe
 			}
 
 			sales = append(sales, sale)
-
-			output <- wrapper.Result{Data: sales}
 		}
+
+		output <- wrapper.Result{Data: sales}
+
 	}()
 
 	return output

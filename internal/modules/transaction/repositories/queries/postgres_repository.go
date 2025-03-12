@@ -32,7 +32,7 @@ func (p queryPostgresRepository) FindAllTransactions(ctx context.Context) <-chan
 	go func() {
 		defer close(output)
 
-		rows, err := p.postgres.Query(context.Background(), query)
+		rows, err := p.postgres.Query(ctx, query)
 		if err != nil {
 			output <- wrapper.Result{Error: err}
 			return

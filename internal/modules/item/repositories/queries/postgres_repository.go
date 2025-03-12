@@ -35,7 +35,7 @@ func (q queryPostgresRepository) FindAllItems(ctx context.Context) <-chan wrappe
 	go func() {
 		defer close(output)
 
-		rows, err := q.postgres.Query(context.Background(), query)
+		rows, err := q.postgres.Query(ctx, query)
 		if err != nil {
 			output <- wrapper.Result{Error: err}
 			return

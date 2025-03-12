@@ -13,21 +13,21 @@ import (
 
 type queryPostgresRepository struct {
 	postgres *pgxpool.Pool
-	logger log.Logger
+	logger   log.Logger
 }
 
-func NewQueryPostgresRepository(postgres *pgxpool.Pool, log log.Logger) inventory.PostgresRepositoryQuery{
-	return &queryPostgresRepository{ 
+func NewQueryPostgresRepository(postgres *pgxpool.Pool, log log.Logger) inventory.PostgresRepositoryQuery {
+	return &queryPostgresRepository{
 		postgres: postgres,
-		logger: log,
+		logger:   log,
 	}
 }
 
-func (c queryPostgresRepository) FindListInventory(ctx context.Context, location string) <-chan wrapper.Result{
+func (c queryPostgresRepository) FindListInventory(ctx context.Context, location string) <-chan wrapper.Result {
 	output := make(chan wrapper.Result)
 
 	var inventoryTable string
-	
+
 	// Determine table insert based on location
 	switch location {
 	case "toko":
@@ -40,7 +40,7 @@ func (c queryPostgresRepository) FindListInventory(ctx context.Context, location
 		inventoryTable = "inventory_rusak"
 	default:
 		err := fmt.Errorf("invalid location: %s", location)
-		output <- wrapper.Result{Error: err} 
+		output <- wrapper.Result{Error: err}
 	}
 
 	query := fmt.Sprintf(`
@@ -52,7 +52,7 @@ func (c queryPostgresRepository) FindListInventory(ctx context.Context, location
 	go func() {
 		defer close(output)
 
-		rows, err := c.postgres.Query(context.Background(), query)
+		rows, err := c.postgres.Query(ctx, query)
 		if err != nil {
 			output <- wrapper.Result{Error: err}
 			return
@@ -63,12 +63,12 @@ func (c queryPostgresRepository) FindListInventory(ctx context.Context, location
 			var item entity.InventoryItem
 			err = rows.Scan(&item.ItemID, &item.Quantity, &item.Description, &item.Price)
 			if err != nil {
-				output <- wrapper.Result{Error:err}
+				output <- wrapper.Result{Error: err}
 				return
 			}
 			inventoryItems = append(inventoryItems, item)
 		}
-		
+
 		output <- wrapper.Result{Data: inventoryItems}
 	}()
 
