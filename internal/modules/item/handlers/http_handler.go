@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"erp-api/internal/modules/item"
+	"erp-api/internal/modules/item/models/request"
 	"erp-api/internal/pkg/log"
 	"erp-api/internal/pkg/util/httpres"
 	"net/http"
@@ -11,20 +12,23 @@ import (
 )
 
 type ItemHttpHandler struct {
-	ItemUsecaseQuery item.UsecaseQuery
-	Validator        *validator.Validate
-	Logger           log.Logger
+	ItemUsecaseQuery   item.UsecaseQuery
+	ItemUsecaseCommand item.UsecaseCommand
+	Validator          *validator.Validate
+	Logger             log.Logger
 }
 
-func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, log log.Logger) {
+func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.UsecaseCommand, log log.Logger) {
 	handler := &ItemHttpHandler{
-		ItemUsecaseQuery: auq,
-		Logger:           log,
-		Validator:        validator.New(),
+		ItemUsecaseQuery:   auq,
+		ItemUsecaseCommand: auc,
+		Logger:             log,
+		Validator:          validator.New(),
 	}
 
 	route := app.Group("/api/items")
 	route.GET("", handler.GetItems)
+	route.POST("", handler.CreateItem)
 }
 
 func (i ItemHttpHandler) GetItems(ctx *gin.Context) {
@@ -34,5 +38,25 @@ func (i ItemHttpHandler) GetItems(ctx *gin.Context) {
 		return
 	}
 
-	httpres.APIResponse(ctx, http.StatusOK, "Items fetched successfully", resp)
+	httpres.APIResponse(ctx, http.StatusOK, "items fetched successfully", resp)
+}
+
+func (i ItemHttpHandler) CreateItem(ctx *gin.Context) {
+	req := new(request.SubmitItem)
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		return
+	}
+
+	if err := i.Validator.Struct(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		return
+	}
+
+	if err := i.ItemUsecaseCommand.SaveItem(ctx, *req); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save items", err)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "successfully added items", nil)
 }

@@ -22,6 +22,7 @@ import (
 
 	itemHandler "erp-api/internal/modules/item/handlers"
 
+	itemRepoCommand "erp-api/internal/modules/item/repositories/commands"
 	itemRepoQuery "erp-api/internal/modules/item/repositories/queries"
 	itemUseCase "erp-api/internal/modules/item/usecases"
 
@@ -90,9 +91,11 @@ func main() {
 	saleHandler.InitSaleHttpHandler(server, saleUseCase, logger_log)
 
 	itemQueryPostgresRepo := itemRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
-	itemUseCase := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger_log)
+	itemCommandPostgresRepo := itemRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
+	itemUseCaseQuery := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger_log)
+	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, logger_log)
 
-	itemHandler.InitItemHttpHandler(server, itemUseCase, logger_log)
+	itemHandler.InitItemHttpHandler(server, itemUseCaseQuery, itemUseCaseCommand, logger_log)
 
 	transactionQueryPostgresRepo := transactionRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
 	transactionUseCase := transactionUseCase.NewQueryUsecase(transactionQueryPostgresRepo, logger_log)
