@@ -11,6 +11,7 @@ import (
 	"erp-api/internal/routes"
 
 	inventoryHandler "erp-api/internal/modules/inventory/handlers"
+	inventoryCommandQuery "erp-api/internal/modules/inventory/repositories/commands"
 	inventoryRepoQuery "erp-api/internal/modules/inventory/repositories/queries"
 
 	inventoryUseCase "erp-api/internal/modules/inventory/usecases"
@@ -81,6 +82,7 @@ func main() {
 	routes.RegisterRoutes(apiRoutes)
 
 	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+	inventoryCommandPostgresRepo := inventoryCommandQuery.NewCommandPostgresRepository(db.DB, logger_log)
 	inventoryUseCase := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger_log)
 
 	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCase, logger_log)
@@ -93,7 +95,7 @@ func main() {
 	itemQueryPostgresRepo := itemRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
 	itemCommandPostgresRepo := itemRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
 	itemUseCaseQuery := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger_log)
-	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, logger_log)
+	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, inventoryCommandPostgresRepo, logger_log)
 
 	itemHandler.InitItemHttpHandler(server, itemUseCaseQuery, itemUseCaseCommand, logger_log)
 

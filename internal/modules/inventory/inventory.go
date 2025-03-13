@@ -3,6 +3,7 @@ package inventory
 import (
 	"context"
 	"erp-api/internal/modules/inventory/models/response"
+	itemEntity "erp-api/internal/modules/item/models/entity"
 	wrapper "erp-api/internal/pkg/helpers"
 )
 
@@ -11,7 +12,6 @@ type UsecaseQuery interface {
 }
 
 type UsecaseCommand interface {
-
 }
 
 type PostgresRepositoryQuery interface {
@@ -19,5 +19,5 @@ type PostgresRepositoryQuery interface {
 }
 
 type PostgresRepositoryCommand interface {
-	
+	BatchInsertInventory(ctx context.Context, items []itemEntity.Item) error
 }

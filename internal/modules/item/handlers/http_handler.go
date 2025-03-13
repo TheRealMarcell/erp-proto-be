@@ -27,11 +27,17 @@ func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.Usecas
 	}
 
 	route := app.Group("/api/items")
-	route.GET("", handler.GetItems)
-	route.POST("", handler.CreateItem)
+	route.GET("", handler.getItems)
+
+	route.POST("", handler.createItem)
+
+	// route.PUT("", handler.updateItem)
+	// route.PUT("/price", handler.updateItemPrice)
+	// route.PUT("/:id", handler.correctItem)
+	// route.PUT("/rusak", handler.brokenItem)
 }
 
-func (i ItemHttpHandler) GetItems(ctx *gin.Context) {
+func (i ItemHttpHandler) getItems(ctx *gin.Context) {
 	resp, err := i.ItemUsecaseQuery.GetItems(ctx)
 	if err != nil {
 		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not get items", err)
@@ -41,7 +47,7 @@ func (i ItemHttpHandler) GetItems(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "items fetched successfully", resp)
 }
 
-func (i ItemHttpHandler) CreateItem(ctx *gin.Context) {
+func (i ItemHttpHandler) createItem(ctx *gin.Context) {
 	req := new(request.SubmitItem)
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
@@ -60,3 +66,11 @@ func (i ItemHttpHandler) CreateItem(ctx *gin.Context) {
 
 	httpres.APIResponse(ctx, http.StatusOK, "successfully added items", nil)
 }
+
+func (i ItemHttpHandler) updateItem(ctx *gin.Context) {}
+
+func (i ItemHttpHandler) correctItem(ctx *gin.Context) {}
+
+func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {}
+
+func (i ItemHttpHandler) updateItemPrice(ctx *gin.Context) {}

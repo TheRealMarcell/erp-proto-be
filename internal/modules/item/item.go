@@ -14,6 +14,7 @@ type UsecaseQuery interface {
 
 type UsecaseCommand interface {
 	SaveItem(ctx context.Context, payload request.SubmitItem) error
+	UpdateItem(ctx context.Context, payload request.UpdateItem) error
 }
 
 type PostgresRepositoryQuery interface {
@@ -21,5 +22,6 @@ type PostgresRepositoryQuery interface {
 }
 
 type PostgresRepositoryCommand interface {
-	InsertItems(ctx context.Context, items []entity.Item) error
+	BatchInsertItems(ctx context.Context, items []entity.Item) error
+	// ModifyItem(ctx context.Context, item entity.Item) error
 }
