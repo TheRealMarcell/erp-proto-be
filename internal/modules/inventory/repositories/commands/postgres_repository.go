@@ -64,3 +64,36 @@ func (c commandPostgresRepository) BatchInsertInventory(ctx context.Context, ite
 
 	return nil
 }
+
+func (c commandPostgresRepository) BatchUpdateAddInventory(ctx context.Context, items []itemEntity.StorageItem, location string) error {
+	// set location for updating inventory
+	for i := range items {
+		items[i].Location = location
+	}
+
+	tx, err := c.postgres.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("transaction error: %v", err)
+	}
+
+	defer tx.Rollback(ctx)
+
+	batch := &pgx.Batch{}
+
+	for _, item := range items {
+		query := fmt.Sprintf("UPDATE %s SET quantity = quantity + $1 WHERE item_id = $2", item.Location)
+		batch.Queue(query, item.Quantity, item.ItemID)
+	}
+
+	results := tx.SendBatch(ctx, batch)
+
+	if err := results.Close(); err != nil {
+		return fmt.Errorf("batch insert error: %v", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("transaction commit error: %v", err)
+	}
+
+	return nil
+}

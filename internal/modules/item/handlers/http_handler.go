@@ -31,7 +31,7 @@ func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.Usecas
 
 	route.POST("", handler.createItem)
 
-	// route.PUT("", handler.updateItem)
+	route.PUT("", handler.updateItem)
 	// route.PUT("/price", handler.updateItemPrice)
 	// route.PUT("/:id", handler.correctItem)
 	// route.PUT("/rusak", handler.brokenItem)
@@ -67,7 +67,23 @@ func (i ItemHttpHandler) createItem(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "successfully added items", nil)
 }
 
-func (i ItemHttpHandler) updateItem(ctx *gin.Context) {}
+func (i ItemHttpHandler) updateItem(ctx *gin.Context) {
+	req := new(request.UpdateItem)
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+	}
+
+	if err := i.Validator.Struct(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+	}
+
+	if err := i.ItemUsecaseCommand.UpdateItem(ctx, *req); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update items", err)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "successfully updated items", nil)
+}
 
 func (i ItemHttpHandler) correctItem(ctx *gin.Context) {}
 

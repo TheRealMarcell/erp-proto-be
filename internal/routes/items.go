@@ -10,40 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func updateItem(ctx *gin.Context) {
-	var update_request model.UpdateItemRequest
-
-	err := ctx.ShouldBindJSON(&update_request)
-	if err != nil {
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", nil)
-		return
-	}
-
-	for _, item := range update_request.Items {
-		var storage_item model.StorageItem
-		storage_item.ItemID = item.ItemID
-		storage_item.Quantity = item.Quantity
-		storage_item.Location = "inventory_gudang"
-
-		err = storage_item.UpdateItem("add")
-		if err != nil {
-			fmt.Println(err)
-			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item", nil)
-			return
-		}
-
-		err = model.UpdateSaleReturQty(item.Quantity, item.SaleID)
-		if err != nil {
-			fmt.Println(err)
-			httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update sale retur qty", nil)
-			return
-		}
-	}
-
-	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
-}
-
 func correctItem(ctx *gin.Context) {
 	id := ctx.Param("id")
 

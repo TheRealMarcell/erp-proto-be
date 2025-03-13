@@ -17,6 +17,7 @@ import (
 	inventoryUseCase "erp-api/internal/modules/inventory/usecases"
 
 	saleHandler "erp-api/internal/modules/sale/handlers"
+	saleRepoCommand "erp-api/internal/modules/sale/repositories/commands"
 	saleRepoQuery "erp-api/internal/modules/sale/repositories/queries"
 
 	saleUseCase "erp-api/internal/modules/sale/usecases"
@@ -88,6 +89,7 @@ func main() {
 	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCase, logger_log)
 
 	saleQueryPostgresRepo := saleRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+	saleCommandPostgresRepo := saleRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
 	saleUseCase := saleUseCase.NewQueryUsecase(saleQueryPostgresRepo, logger_log)
 
 	saleHandler.InitSaleHttpHandler(server, saleUseCase, logger_log)
@@ -95,7 +97,7 @@ func main() {
 	itemQueryPostgresRepo := itemRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
 	itemCommandPostgresRepo := itemRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
 	itemUseCaseQuery := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger_log)
-	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, inventoryCommandPostgresRepo, logger_log)
+	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, inventoryCommandPostgresRepo, saleCommandPostgresRepo, logger_log)
 
 	itemHandler.InitItemHttpHandler(server, itemUseCaseQuery, itemUseCaseCommand, logger_log)
 
