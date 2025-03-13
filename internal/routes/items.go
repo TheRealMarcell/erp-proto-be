@@ -1,38 +1,12 @@
 package routes
 
 import (
-	"encoding/json"
 	"erp-api/internal/model"
 	"erp-api/internal/pkg/util/httpres"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-func correctItem(ctx *gin.Context) {
-	id := ctx.Param("id")
-
-	var item model.StorageItem
-
-	err := json.NewDecoder(ctx.Request.Body).Decode(&item)
-	item.ItemID = id
-
-	if err != nil {
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", nil)
-		return
-	}
-
-	err = item.UpdateItem("set")
-	if err != nil {
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item", nil)
-		return
-	}
-
-	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
-}
 
 func brokenItem(ctx *gin.Context) {
 	// update total on sale id, insert to inventory_rusak

@@ -30,11 +30,10 @@ func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.Usecas
 	route.GET("", handler.getItems)
 
 	route.POST("", handler.createItem)
-
 	route.PUT("", handler.updateItem)
+	route.PUT("/:id", handler.correctItem)
+	route.PUT("/rusak", handler.brokenItem)
 	// route.PUT("/price", handler.updateItemPrice)
-	// route.PUT("/:id", handler.correctItem)
-	// route.PUT("/rusak", handler.brokenItem)
 }
 
 func (i ItemHttpHandler) getItems(ctx *gin.Context) {
@@ -69,12 +68,15 @@ func (i ItemHttpHandler) createItem(ctx *gin.Context) {
 
 func (i ItemHttpHandler) updateItem(ctx *gin.Context) {
 	req := new(request.UpdateItem)
+
 	if err := ctx.ShouldBindJSON(req); err != nil {
 		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		return
 	}
 
 	if err := i.Validator.Struct(req); err != nil {
 		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		return
 	}
 
 	if err := i.ItemUsecaseCommand.UpdateItem(ctx, *req); err != nil {
@@ -85,8 +87,47 @@ func (i ItemHttpHandler) updateItem(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "successfully updated items", nil)
 }
 
-func (i ItemHttpHandler) correctItem(ctx *gin.Context) {}
+func (i ItemHttpHandler) correctItem(ctx *gin.Context) {
+	id := ctx.Param("id")
 
-func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {}
+	req := new(request.CorrectItem)
+
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		return
+	}
+
+	if err := i.Validator.Struct(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		return
+	}
+
+	if err := i.ItemUsecaseCommand.CorrectItem(ctx, *req, id); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not correct item", err)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
+}
+
+func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {
+	req := new(request.UpdateItem)
+
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		return
+	}
+
+	if err := i.Validator.Struct(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		return
+	}
+
+	if err := i.ItemUsecaseCommand.BrokenItem(ctx, *req); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update items", err)
+		return
+	}
+
+}
 
 func (i ItemHttpHandler) updateItemPrice(ctx *gin.Context) {}

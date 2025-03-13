@@ -21,4 +21,6 @@ type PostgresRepositoryQuery interface {
 type PostgresRepositoryCommand interface {
 	BatchInsertInventory(ctx context.Context, items []itemEntity.Item) error
 	BatchUpdateAddInventory(ctx context.Context, storageItems []itemEntity.StorageItem, location string) error
+
+	UpdateInventory(ctx context.Context, storageItem itemEntity.StorageItem) error
 }

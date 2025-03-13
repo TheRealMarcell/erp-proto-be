@@ -37,7 +37,9 @@ func (c commandPostgresRepository) BatchUpdateReturQty(ctx context.Context, item
 	batch := &pgx.Batch{}
 
 	for _, item := range items.Items {
-		query := "UPDATE sales SET quantity_retur = quantity_retur + $1 WHERE sale_id = $2"
+		query := `UPDATE sales 
+		SET quantity_retur = quantity_retur + $1 
+		WHERE sale_id = $2`
 		batch.Queue(query, item.Quantity, item.SaleID)
 	}
 

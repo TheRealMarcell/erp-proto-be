@@ -5,8 +5,6 @@ import (
 )
 
 func RegisterRoutes(server *gin.RouterGroup) {
-	server.PUT("items/:id", correctItem)  // koreksi
-	server.PUT("items/rusak", brokenItem) // retur barang rusak
 	server.PUT("items/price", updateItemPrice)
 
 	server.POST("/transactions", createTransaction)

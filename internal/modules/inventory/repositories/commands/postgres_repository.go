@@ -81,7 +81,10 @@ func (c commandPostgresRepository) BatchUpdateAddInventory(ctx context.Context, 
 	batch := &pgx.Batch{}
 
 	for _, item := range items {
-		query := fmt.Sprintf("UPDATE %s SET quantity = quantity + $1 WHERE item_id = $2", item.Location)
+		query := fmt.Sprintf(`UPDATE %s 
+		SET quantity = quantity + $1 
+		WHERE item_id = $2`, item.Location)
+
 		batch.Queue(query, item.Quantity, item.ItemID)
 	}
 
@@ -93,6 +96,20 @@ func (c commandPostgresRepository) BatchUpdateAddInventory(ctx context.Context, 
 
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("transaction commit error: %v", err)
+	}
+
+	return nil
+}
+
+func (c commandPostgresRepository) UpdateInventory(ctx context.Context, storageItem itemEntity.StorageItem) error {
+	query := fmt.Sprintf(`UPDATE %s
+	SET quantity = $1
+	WHERE item_id = $2`, storageItem.Location)
+
+	_, err := c.postgres.Query(ctx, query, storageItem.Quantity, storageItem.ItemID)
+
+	if err != nil {
+		return err
 	}
 
 	return nil

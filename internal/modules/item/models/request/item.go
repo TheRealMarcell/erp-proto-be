@@ -15,3 +15,12 @@ type SubmitItem struct {
 type UpdateItem struct {
 	Items []UpdateItemObject `json:"items"`
 }
+
+type BrokenItem struct {
+	Items []UpdateItemObject `json:"items"`
+}
+
+type CorrectItem struct {
+	Location string `json:"location"`
+	Quantity int64  `json:"quantity"`
+}
