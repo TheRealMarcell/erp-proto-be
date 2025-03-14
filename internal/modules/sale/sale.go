@@ -2,6 +2,7 @@ package sale
 
 import (
 	"context"
+	"erp-api/internal/modules/sale/models/entity"
 	"erp-api/internal/modules/sale/models/response"
 
 	itemRequest "erp-api/internal/modules/item/models/request"
@@ -18,5 +19,6 @@ type PostgresRepositoryQuery interface {
 }
 
 type PostgresRepositoryCommand interface {
+	BatchInsertSales(ctx context.Context, sales []entity.Sale, transactionId int64) error
 	BatchUpdateReturQty(ctx context.Context, items itemRequest.UpdateItem) error
 }

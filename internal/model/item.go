@@ -89,18 +89,3 @@ func (item *StorageItem) UpdateItem(operation string) error {
 
 	return nil
 }
-
-func UpdatePrice(item_price ItemPriceRequest) error {
-	query := `
-	UPDATE items
-	SET price = $1
-	WHERE item_id = $2
-	`
-
-	_, err := db.DB.Query(context.Background(), query, item_price.Price, item_price.ItemID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}

@@ -56,7 +56,7 @@ func (c commandUsecase) UpdateItem(ctx context.Context, payload request.UpdateIt
 	}
 
 	// add qty in inventory gudang
-	if err := c.inventoryRepositoryCommand.BatchUpdateAddInventory(ctx, storageItems, "inventory_gudang"); err != nil {
+	if err := c.inventoryRepositoryCommand.BatchUpdateInventory(ctx, storageItems, "inventory_gudang", "add"); err != nil {
 		return err
 	}
 
@@ -94,7 +94,7 @@ func (c commandUsecase) BrokenItem(ctx context.Context, payload request.UpdateIt
 	}
 
 	// add qty in inventory rusak
-	if err := c.inventoryRepositoryCommand.BatchUpdateAddInventory(ctx, storageItems, "inventory_rusak"); err != nil {
+	if err := c.inventoryRepositoryCommand.BatchUpdateInventory(ctx, storageItems, "inventory_rusak", "add"); err != nil {
 		return err
 	}
 

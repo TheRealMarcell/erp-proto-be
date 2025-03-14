@@ -10,27 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func createTransaction(ctx *gin.Context) {
-	var transaction model.Transaction
-
-	err := ctx.ShouldBindJSON(&transaction)
-
-	if err != nil {
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse sales request", nil)
-		return
-	}
-
-	err = transaction.Save()
-	if err != nil {
-		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save transaction", nil)
-		return
-	}
-
-	httpres.APIResponse(ctx, http.StatusOK, "success", "successfully saved transaction")
-}
-
 func updatePayment(ctx *gin.Context) {
 	id := ctx.Param("id")
 

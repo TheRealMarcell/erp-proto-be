@@ -2,6 +2,7 @@ package transaction
 
 import (
 	"context"
+	"erp-api/internal/modules/transaction/models/request"
 	"erp-api/internal/modules/transaction/models/response"
 	wrapper "erp-api/internal/pkg/helpers"
 )
@@ -12,6 +13,7 @@ type UsecaseQuery interface {
 }
 
 type UsecaseCommand interface {
+	InsertTransaction(ctx context.Context, payload request.Transaction) error
 }
 
 type PostgresRepositoryQuery interface {
@@ -20,4 +22,5 @@ type PostgresRepositoryQuery interface {
 }
 
 type PostgresRepositoryCommand interface {
+	SaveTransaction(ctx context.Context, transaction request.Transaction) (int64, error)
 }

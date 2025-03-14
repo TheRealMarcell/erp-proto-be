@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"erp-api/internal/modules/transaction"
+	"erp-api/internal/modules/transaction/models/request"
 	"erp-api/internal/pkg/log"
 	"erp-api/internal/pkg/util/httpres"
 	"net/http"
@@ -11,21 +12,25 @@ import (
 )
 
 type TransactionHttpHandler struct {
-	TransactionUsecaseQuery transaction.UsecaseQuery
-	Validator               *validator.Validate
-	Logger                  log.Logger
+	TransactionUsecaseQuery   transaction.UsecaseQuery
+	TransactionUsecaseCommand transaction.UsecaseCommand
+	Validator                 *validator.Validate
+	Logger                    log.Logger
 }
 
-func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, log log.Logger) {
+func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, auc transaction.UsecaseCommand, log log.Logger) {
 	handler := &TransactionHttpHandler{
-		TransactionUsecaseQuery: auq,
-		Logger:                  log,
-		Validator:               validator.New(),
+		TransactionUsecaseQuery:   auq,
+		TransactionUsecaseCommand: auc,
+		Logger:                    log,
+		Validator:                 validator.New(),
 	}
 
 	route := app.Group("/api/transactions")
 	route.GET("", handler.GetTransactions)
 	route.GET("/discount_percent", handler.GetTransactionDiscount)
+
+	route.POST("", handler.CreateTransaction)
 }
 
 func (t TransactionHttpHandler) GetTransactions(ctx *gin.Context) {
@@ -46,5 +51,27 @@ func (t TransactionHttpHandler) GetTransactionDiscount(ctx *gin.Context) {
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "success", discount_percent)
+
+}
+
+func (t TransactionHttpHandler) CreateTransaction(ctx *gin.Context) {
+	req := new(request.Transaction)
+
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		return
+	}
+
+	if err := t.Validator.Struct(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		return
+	}
+
+	if err := t.TransactionUsecaseCommand.InsertTransaction(ctx, *req); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not insert transaction", err)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "successfully added transaction", nil)
 
 }
