@@ -3,7 +3,36 @@ package main
 import (
 	db "erp-api/database"
 	docs "erp-api/docs"
+	"erp-api/internal/pkg/log"
+	"net/http"
+	"time"
+
+	"erp-api/internal/pkg/util/configuration"
 	"erp-api/internal/routes"
+
+	inventoryHandler "erp-api/internal/modules/inventory/handlers"
+	inventoryCommandQuery "erp-api/internal/modules/inventory/repositories/commands"
+	inventoryRepoQuery "erp-api/internal/modules/inventory/repositories/queries"
+
+	inventoryUseCase "erp-api/internal/modules/inventory/usecases"
+
+	saleHandler "erp-api/internal/modules/sale/handlers"
+	saleRepoCommand "erp-api/internal/modules/sale/repositories/commands"
+	saleRepoQuery "erp-api/internal/modules/sale/repositories/queries"
+
+	saleUseCase "erp-api/internal/modules/sale/usecases"
+
+	itemHandler "erp-api/internal/modules/item/handlers"
+
+	itemRepoCommand "erp-api/internal/modules/item/repositories/commands"
+	itemRepoQuery "erp-api/internal/modules/item/repositories/queries"
+	itemUseCase "erp-api/internal/modules/item/usecases"
+
+	transactionHandler "erp-api/internal/modules/transaction/handlers"
+	transactionRepoCommand "erp-api/internal/modules/transaction/repositories/commands"
+	transactionRepoQuery "erp-api/internal/modules/transaction/repositories/queries"
+
+	transactionUseCase "erp-api/internal/modules/transaction/usecases"
 
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
@@ -26,26 +55,69 @@ import (
 
 func setupRouter() *gin.Engine {
 	r := gin.Default()
-	r.Use(cors.AllowAll(),)
+	r.Use(cors.AllowAll())
 	return r
 
 }
 
 func main() {
-	db.InitDB()
+	logger := configuration.Logger()
 
-	docs.SwaggerInfo.Title = "Sandbox API - IDP BR Service"	
-	docs.SwaggerInfo.Description = "This is a sandbox API for IDP BR service used for development purposes"		
-	docs.SwaggerInfo.Version = "1.1"	
-	docs.SwaggerInfo.Host = "localhost:8080"	
-	docs.SwaggerInfo.BasePath = "/repository"	
-	docs.SwaggerInfo.Schemes = []string{"http"}	
+	logger_log := log.GetLogger()
+
+	db.InitDB(*logger)
+
+	defer db.DB.Close()
+
+	docs.SwaggerInfo.Title = "Sandbox API - IDP BR Service"
+	docs.SwaggerInfo.Description = "This is a sandbox API for IDP BR service used for development purposes"
+	docs.SwaggerInfo.Version = "1.1"
+	docs.SwaggerInfo.Host = "localhost:8080"
+	docs.SwaggerInfo.BasePath = "/repository"
+	docs.SwaggerInfo.Schemes = []string{"http"}
 
 	server := setupRouter()
 
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	
+
 	apiRoutes := server.Group("/api")
 	routes.RegisterRoutes(apiRoutes)
-	server.Run(":8080")
+
+	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+	inventoryCommandPostgresRepo := inventoryCommandQuery.NewCommandPostgresRepository(db.DB, logger_log)
+	inventoryUseCaseQuery := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger_log)
+	inventoryUseCaseCommand := inventoryUseCase.NewCommandUsecase(inventoryCommandPostgresRepo, logger_log)
+
+	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCaseQuery, inventoryUseCaseCommand, logger_log)
+
+	saleQueryPostgresRepo := saleRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+	saleCommandPostgresRepo := saleRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
+	saleUseCase := saleUseCase.NewQueryUsecase(saleQueryPostgresRepo, logger_log)
+
+	saleHandler.InitSaleHttpHandler(server, saleUseCase, logger_log)
+
+	itemQueryPostgresRepo := itemRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+	itemCommandPostgresRepo := itemRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
+	itemUseCaseQuery := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger_log)
+	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, inventoryCommandPostgresRepo, saleCommandPostgresRepo, logger_log)
+
+	itemHandler.InitItemHttpHandler(server, itemUseCaseQuery, itemUseCaseCommand, logger_log)
+
+	transactionQueryPostgresRepo := transactionRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
+	transactionCommandPostgresRepo := transactionRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
+	transactionUseCaseQuery := transactionUseCase.NewQueryUsecase(transactionQueryPostgresRepo, logger_log)
+	transactionUseCaseCommand := transactionUseCase.NewCommandUsecase(transactionCommandPostgresRepo, saleCommandPostgresRepo, inventoryCommandPostgresRepo, logger_log)
+
+	transactionHandler.InitTransactionHttpHandler(server, transactionUseCaseQuery, transactionUseCaseCommand, logger_log)
+
+	httpServer := &http.Server{
+		Addr:           ":8080",
+		Handler:        server,
+		ReadTimeout:    120 * time.Second,
+		WriteTimeout:   120 * time.Second,
+		IdleTimeout:    120 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	httpServer.ListenAndServe()
 }
