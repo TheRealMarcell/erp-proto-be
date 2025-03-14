@@ -39,3 +39,18 @@ func (c commandPostgresRepository) SaveTransaction(ctx context.Context, tr reque
 
 	return tr.TransactionID, nil
 }
+
+func (c commandPostgresRepository) ModifyPaymentStatus(ctx context.Context, transactionId string, paymentStatus string) error {
+	query := `
+	UPDATE transactions
+	SET payment_status = $1
+	WHERE transaction_id = $2`
+
+	_, err := c.postgres.Query(ctx, query, paymentStatus, transactionId)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

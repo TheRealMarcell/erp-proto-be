@@ -14,6 +14,7 @@ type UsecaseQuery interface {
 
 type UsecaseCommand interface {
 	InsertTransaction(ctx context.Context, payload request.Transaction) error
+	UpdatePaymentStatus(ctx context.Context, transactionId string, paymentStatus string) error
 }
 
 type PostgresRepositoryQuery interface {
@@ -23,4 +24,5 @@ type PostgresRepositoryQuery interface {
 
 type PostgresRepositoryCommand interface {
 	SaveTransaction(ctx context.Context, transaction request.Transaction) (int64, error)
+	ModifyPaymentStatus(ctx context.Context, transactionId string, paymentStatus string) error
 }

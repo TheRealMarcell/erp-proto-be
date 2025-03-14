@@ -31,6 +31,7 @@ func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, a
 	route.GET("/discount_percent", handler.GetTransactionDiscount)
 
 	route.POST("", handler.CreateTransaction)
+	route.PUT("/payment/:id", handler.UpdatePayment)
 }
 
 func (t TransactionHttpHandler) GetTransactions(ctx *gin.Context) {
@@ -73,5 +74,24 @@ func (t TransactionHttpHandler) CreateTransaction(ctx *gin.Context) {
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "successfully added transaction", nil)
+}
 
+func (t TransactionHttpHandler) UpdatePayment(ctx *gin.Context) {
+	id := ctx.Param("id")
+
+	var payment_status struct {
+		PaymentStatus string `json:"payment_status"`
+	}
+
+	if err := ctx.ShouldBindJSON(&payment_status); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request data", nil)
+		return
+	}
+
+	if err := t.TransactionUsecaseCommand.UpdatePaymentStatus(ctx, id, payment_status.PaymentStatus); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update payment status", err)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "successfully updated payment", nil)
 }

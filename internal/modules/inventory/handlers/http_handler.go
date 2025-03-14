@@ -19,22 +19,29 @@ type InventoryHttpHandler struct {
 	Logger                  log.Logger
 }
 
-func InitInventoryHttpHandler(app *gin.Engine, auq inventory.UsecaseQuery, log log.Logger) {
+func InitInventoryHttpHandler(app *gin.Engine, auq inventory.UsecaseQuery, auc inventory.UsecaseCommand, log log.Logger) {
 	handler := &InventoryHttpHandler{
-		InventoryUsecaseQuery: auq,
-		Logger:                log,
-		Validator:             validator.New(),
+		InventoryUsecaseQuery:   auq,
+		InventoryUsecaseCommand: auc,
+		Logger:                  log,
+		Validator:               validator.New(),
 	}
 
 	route := app.Group("/api/inventory")
 	route.GET("/:location", handler.GetInventory)
-	// route.POST("", handler.MoveInventory)
+	route.POST("", handler.MoveInventory)
 }
 
 func (i InventoryHttpHandler) MoveInventory(ctx *gin.Context) {
-	req := new(request.MoveInventoryRequest)
+	req := new(request.MoveInventory)
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move item", nil)
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not parse request", nil)
+		return
+	}
+
+	if err := i.InventoryUsecaseCommand.MoveInventory(ctx, *req); err != nil {
+		fmt.Println(err)
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move items", nil)
 		return
 	}
 

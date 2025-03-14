@@ -85,9 +85,10 @@ func main() {
 
 	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
 	inventoryCommandPostgresRepo := inventoryCommandQuery.NewCommandPostgresRepository(db.DB, logger_log)
-	inventoryUseCase := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger_log)
+	inventoryUseCaseQuery := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger_log)
+	inventoryUseCaseCommand := inventoryUseCase.NewCommandUsecase(inventoryCommandPostgresRepo, logger_log)
 
-	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCase, logger_log)
+	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCaseQuery, inventoryUseCaseCommand, logger_log)
 
 	saleQueryPostgresRepo := saleRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
 	saleCommandPostgresRepo := saleRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)

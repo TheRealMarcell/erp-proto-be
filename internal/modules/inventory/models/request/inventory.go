@@ -1,16 +1,12 @@
 package request
 
-type InventoryMoveItemRequest struct {
-	Source string							`json:"source"`
-	Destination string				`json:"destination"`
-	Location string				`json:"location"`
-	ItemID string 				`json:"item_id"`
-	Quantity int64				`json:"quantity"`
-	Description string		`json:"description"`
+type itemObject struct {
+	ItemID   string `json:"item_id"`
+	Quantity int64  `json:"quantity"`
 }
 
-type MoveInventoryRequest struct {
-	Source string														`json:"source"`
-	Destination string											`json:"destination"`
-	Items []InventoryMoveItemRequest				`json:"items"`
+type MoveInventory struct {
+	Source      string       `json:"source"`
+	Destination string       `json:"destination"`
+	Items       []itemObject `json:"items"`
 }

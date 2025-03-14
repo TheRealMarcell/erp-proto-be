@@ -64,3 +64,10 @@ func (c commandUsecase) InsertTransaction(ctx context.Context, payload request.T
 
 	return nil
 }
+
+func (c commandUsecase) UpdatePaymentStatus(ctx context.Context, transactionId string, paymentStatus string) error {
+	if err := c.transactionRepositoryCommand.ModifyPaymentStatus(ctx, transactionId, paymentStatus); err != nil {
+		return err
+	}
+	return nil
+}
