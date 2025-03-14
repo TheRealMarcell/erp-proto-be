@@ -17,6 +17,7 @@ type UsecaseCommand interface {
 	UpdateItem(ctx context.Context, payload request.UpdateItem) error
 	CorrectItem(ctx context.Context, payload request.CorrectItem, id string) error
 	BrokenItem(ctx context.Context, payload request.UpdateItem) error
+	UpdateItemPrice(ctx context.Context, payload request.ItemPrice) error
 }
 
 type PostgresRepositoryQuery interface {
@@ -25,4 +26,5 @@ type PostgresRepositoryQuery interface {
 
 type PostgresRepositoryCommand interface {
 	BatchInsertItems(ctx context.Context, items []entity.Item) error
+	ModifyItemPrice(ctx context.Context, price request.ItemPrice) error
 }

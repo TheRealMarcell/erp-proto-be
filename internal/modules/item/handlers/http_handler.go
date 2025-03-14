@@ -33,7 +33,7 @@ func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.Usecas
 	route.PUT("", handler.updateItem)
 	route.PUT("/:id", handler.correctItem)
 	route.PUT("/rusak", handler.brokenItem)
-	// route.PUT("/price", handler.updateItemPrice)
+	route.PUT("/price", handler.updateItemPrice)
 }
 
 func (i ItemHttpHandler) getItems(ctx *gin.Context) {
@@ -124,10 +124,32 @@ func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {
 	}
 
 	if err := i.ItemUsecaseCommand.BrokenItem(ctx, *req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update items", err)
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update broken items", err)
 		return
 	}
 
+	httpres.APIResponse(ctx, http.StatusOK, "broken items added", nil)
+
 }
 
-func (i ItemHttpHandler) updateItemPrice(ctx *gin.Context) {}
+func (i ItemHttpHandler) updateItemPrice(ctx *gin.Context) {
+	req := new(request.ItemPrice)
+
+	if err := ctx.ShouldBindJSON(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		return
+	}
+
+	if err := i.Validator.Struct(req); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "validator error", err)
+		return
+	}
+
+	if err := i.ItemUsecaseCommand.UpdateItemPrice(ctx, *req); err != nil {
+		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item price", err)
+		return
+	}
+
+	httpres.APIResponse(ctx, http.StatusOK, "item price updated", nil)
+
+}

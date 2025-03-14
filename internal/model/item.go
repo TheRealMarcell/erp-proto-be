@@ -90,39 +90,6 @@ func (item *StorageItem) UpdateItem(operation string) error {
 	return nil
 }
 
-func SaveBrokenItem(broken_item BrokenItem) error {
-	qty, err := GetItemQty(broken_item.ItemID, "inventory_rusak")
-	if err != nil {
-		return err
-	}
-
-	new_quantity := *qty + broken_item.Quantity
-
-	query := `
-	UPDATE inventory_rusak
-	SET quantity = $1
-	WHERE item_id = $2
-	`
-
-	_, err = db.DB.Query(context.Background(), query, new_quantity, broken_item.ItemID)
-	if err != nil {
-		return err
-	}
-
-	query = `
-	UPDATE sales
-	SET quantity_retur = quantity_retur + $1
-	WHERE sale_id = $2`
-
-	_, err = db.DB.Query(context.Background(), query, broken_item.Quantity, broken_item.SaleID)
-	if err != nil {
-		return err
-	}
-
-	return nil
-
-}
-
 func UpdatePrice(item_price ItemPriceRequest) error {
 	query := `
 	UPDATE items

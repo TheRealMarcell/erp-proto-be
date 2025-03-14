@@ -4,6 +4,7 @@ import (
 	"context"
 	"erp-api/internal/modules/item"
 	"erp-api/internal/modules/item/models/entity"
+	"erp-api/internal/modules/item/models/request"
 	"erp-api/internal/pkg/log"
 	"fmt"
 
@@ -46,6 +47,21 @@ func (c commandPostgresRepository) BatchInsertItems(ctx context.Context, items [
 
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("transaction commit error: %v", err)
+	}
+
+	return nil
+}
+
+func (c commandPostgresRepository) ModifyItemPrice(ctx context.Context, price request.ItemPrice) error {
+	query := `
+	UPDATE items
+	SET price = $1
+	WHERE item_id = $2
+	`
+
+	_, err := c.postgres.Query(ctx, query, price.Price, price.ItemID)
+	if err != nil {
+		return err
 	}
 
 	return nil

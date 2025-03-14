@@ -105,3 +105,11 @@ func (c commandUsecase) BrokenItem(ctx context.Context, payload request.UpdateIt
 
 	return nil
 }
+
+func (c commandUsecase) UpdateItemPrice(ctx context.Context, payload request.ItemPrice) error {
+	if err := c.itemRepositoryCommand.ModifyItemPrice(ctx, payload); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -2,7 +2,7 @@ package request
 
 import "erp-api/internal/modules/item/models/entity"
 
-type UpdateItemObject struct {
+type updateItemObject struct {
 	ItemID   string `json:"item_id"`
 	Quantity int64  `json:"quantity"`
 	SaleID   int64  `json:"sale_id"`
@@ -13,14 +13,19 @@ type SubmitItem struct {
 }
 
 type UpdateItem struct {
-	Items []UpdateItemObject `json:"items"`
+	Items []updateItemObject `json:"items"`
 }
 
 type BrokenItem struct {
-	Items []UpdateItemObject `json:"items"`
+	Items []updateItemObject `json:"items"`
 }
 
 type CorrectItem struct {
 	Location string `json:"location"`
 	Quantity int64  `json:"quantity"`
+}
+
+type ItemPrice struct {
+	ItemID string `json:"item_id"`
+	Price  int64  `json:"price"`
 }

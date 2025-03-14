@@ -5,7 +5,7 @@ import (
 )
 
 func RegisterRoutes(server *gin.RouterGroup) {
-	server.PUT("items/price", updateItemPrice)
+	// server.PUT("items/price", updateItemPrice)
 
 	server.POST("/transactions", createTransaction)
 	server.PUT("/transactions/payment/:id", updatePayment)
