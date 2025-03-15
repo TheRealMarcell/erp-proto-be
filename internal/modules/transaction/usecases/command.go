@@ -9,6 +9,7 @@ import (
 	"erp-api/internal/modules/transaction/models/request"
 	"fmt"
 
+	"erp-api/internal/pkg/helpers"
 	"erp-api/internal/pkg/log"
 )
 
@@ -40,6 +41,11 @@ func (c commandUsecase) InsertTransaction(ctx context.Context, payload request.T
 
 	// save sale
 	if err := c.saleRepositoryCommand.BatchInsertSales(ctx, payload.Sales, transactionId); err != nil {
+		return err
+	}
+
+	// sanitise location
+	if err := helpers.IsValidLocation(payload.Location); err != nil {
 		return err
 	}
 

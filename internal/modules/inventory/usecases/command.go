@@ -5,7 +5,9 @@ import (
 	"erp-api/internal/modules/inventory"
 	"erp-api/internal/modules/inventory/models/request"
 	"erp-api/internal/modules/item/models/entity"
+	"erp-api/internal/pkg/helpers"
 	"erp-api/internal/pkg/log"
+	"errors"
 	"fmt"
 )
 
@@ -31,6 +33,20 @@ func (c commandUsecase) MoveInventory(ctx context.Context, payload request.MoveI
 		}
 		storageItems = append(storageItems, storageItem)
 	}
+
+	// sanitise inventory locations
+	if err := helpers.IsValidLocation(payload.Source); err != nil {
+		return err
+	}
+
+	if err := helpers.IsValidLocation(payload.Destination); err != nil {
+		return err
+	}
+
+	if payload.Destination == payload.Source {
+		return errors.New("source and destionation cannot be the same")
+	}
+
 	// for each item decrease qty in source and add to destination
 	formatted_source := fmt.Sprintf("inventory_%v", payload.Source)
 	formatted_destination := fmt.Sprintf("inventory_%v", payload.Destination)

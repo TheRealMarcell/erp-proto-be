@@ -30,8 +30,7 @@ func InitSaleHttpHandler(app *gin.Engine, auq sale.UsecaseQuery, log log.Logger)
 func (s SaleHttpHandler) GetListSales(ctx *gin.Context) {
 	resp, err := s.SaleUsecaseQuery.GetSales(ctx)
 	if err != nil {
-		msg := "could not get list of sales"
-		httpres.APIResponse(ctx, http.StatusInternalServerError, msg, err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not get list of sales", err)
 		return
 	}
 

@@ -37,7 +37,7 @@ func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, a
 func (t TransactionHttpHandler) GetTransactions(ctx *gin.Context) {
 	resp, err := t.TransactionUsecaseQuery.GetTransactions(ctx)
 	if err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not get transaction", nil)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not get transaction", err)
 		return
 	}
 
@@ -47,7 +47,7 @@ func (t TransactionHttpHandler) GetTransactions(ctx *gin.Context) {
 func (t TransactionHttpHandler) GetTransactionDiscount(ctx *gin.Context) {
 	discount_percent, err := t.TransactionUsecaseQuery.GetDiscountPercentages(ctx)
 	if err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not fetch discount percent", nil)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not fetch discount percent", err)
 		return
 	}
 
@@ -59,17 +59,17 @@ func (t TransactionHttpHandler) CreateTransaction(ctx *gin.Context) {
 	req := new(request.Transaction)
 
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request", err)
 		return
 	}
 
 	if err := t.Validator.Struct(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "validator error", err)
 		return
 	}
 
 	if err := t.TransactionUsecaseCommand.InsertTransaction(ctx, *req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not insert transaction", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not insert transaction", err)
 		return
 	}
 
@@ -84,12 +84,12 @@ func (t TransactionHttpHandler) UpdatePayment(ctx *gin.Context) {
 	}
 
 	if err := ctx.ShouldBindJSON(&payment_status); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request data", nil)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request data", err)
 		return
 	}
 
 	if err := t.TransactionUsecaseCommand.UpdatePaymentStatus(ctx, id, payment_status.PaymentStatus); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update payment status", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not update payment status", err)
 		return
 	}
 

@@ -26,31 +26,21 @@ func NewQueryPostgresRepository(postgres *pgxpool.Pool, log log.Logger) inventor
 func (c queryPostgresRepository) FindListInventory(ctx context.Context, location string) <-chan wrapper.Result {
 	output := make(chan wrapper.Result)
 
-	var inventoryTable string
-
-	// Determine table insert based on location
-	switch location {
-	case "toko":
-		inventoryTable = "inventory_toko"
-	case "tiktok":
-		inventoryTable = "inventory_tiktok"
-	case "gudang":
-		inventoryTable = "inventory_gudang"
-	case "rusak":
-		inventoryTable = "inventory_rusak"
-	default:
-		err := fmt.Errorf("invalid location: %s", location)
-		output <- wrapper.Result{Error: err}
-	}
-
-	query := fmt.Sprintf(`
-	SELECT i.item_id, quantity, i.description, price 
-	FROM %s i
-	INNER JOIN items ON i.item_id = items.item_id
-	`, inventoryTable)
-
 	go func() {
 		defer close(output)
+
+		// sanitise and format location
+		if err := wrapper.IsValidLocation(location); err != nil {
+			output <- wrapper.Result{Error: err}
+		}
+
+		formatted_location := fmt.Sprintf("inventory_%v", location)
+
+		query := fmt.Sprintf(`
+		SELECT i.item_id, quantity, i.description, price 
+		FROM %s i
+		INNER JOIN items ON i.item_id = items.item_id
+		`, formatted_location)
 
 		rows, err := c.postgres.Query(ctx, query)
 		if err != nil {
