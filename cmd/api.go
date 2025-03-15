@@ -61,11 +61,11 @@ func setupRouter() *gin.Engine {
 }
 
 func main() {
-	logger := configuration.Logger()
+	db_logger := configuration.Logger()
 
-	logger_log := log.GetLogger()
+	logger := log.GetLogger()
 
-	db.InitDB(*logger)
+	db.InitDB(*db_logger)
 
 	defer db.DB.Close()
 
@@ -83,32 +83,32 @@ func main() {
 	apiRoutes := server.Group("/api")
 	routes.RegisterRoutes(apiRoutes)
 
-	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
-	inventoryCommandPostgresRepo := inventoryCommandQuery.NewCommandPostgresRepository(db.DB, logger_log)
-	inventoryUseCaseQuery := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger_log)
-	inventoryUseCaseCommand := inventoryUseCase.NewCommandUsecase(inventoryCommandPostgresRepo, logger_log)
+	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger)
+	inventoryCommandPostgresRepo := inventoryCommandQuery.NewCommandPostgresRepository(db.DB, logger)
+	inventoryUseCaseQuery := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger)
+	inventoryUseCaseCommand := inventoryUseCase.NewCommandUsecase(inventoryCommandPostgresRepo, logger)
 
-	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCaseQuery, inventoryUseCaseCommand, logger_log)
+	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCaseQuery, inventoryUseCaseCommand, logger)
 
-	saleQueryPostgresRepo := saleRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
-	saleCommandPostgresRepo := saleRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
-	saleUseCase := saleUseCase.NewQueryUsecase(saleQueryPostgresRepo, logger_log)
+	saleQueryPostgresRepo := saleRepoQuery.NewQueryPostgresRepository(db.DB, logger)
+	saleCommandPostgresRepo := saleRepoCommand.NewCommandPostgresRepository(db.DB, logger)
+	saleUseCase := saleUseCase.NewQueryUsecase(saleQueryPostgresRepo, logger)
 
-	saleHandler.InitSaleHttpHandler(server, saleUseCase, logger_log)
+	saleHandler.InitSaleHttpHandler(server, saleUseCase, logger)
 
-	itemQueryPostgresRepo := itemRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
-	itemCommandPostgresRepo := itemRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
-	itemUseCaseQuery := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger_log)
-	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, inventoryCommandPostgresRepo, saleCommandPostgresRepo, logger_log)
+	itemQueryPostgresRepo := itemRepoQuery.NewQueryPostgresRepository(db.DB, logger)
+	itemCommandPostgresRepo := itemRepoCommand.NewCommandPostgresRepository(db.DB, logger)
+	itemUseCaseQuery := itemUseCase.NewQueryUsecase(itemQueryPostgresRepo, logger)
+	itemUseCaseCommand := itemUseCase.NewCommandUsecase(itemCommandPostgresRepo, inventoryCommandPostgresRepo, saleCommandPostgresRepo, logger)
 
-	itemHandler.InitItemHttpHandler(server, itemUseCaseQuery, itemUseCaseCommand, logger_log)
+	itemHandler.InitItemHttpHandler(server, itemUseCaseQuery, itemUseCaseCommand, logger)
 
-	transactionQueryPostgresRepo := transactionRepoQuery.NewQueryPostgresRepository(db.DB, logger_log)
-	transactionCommandPostgresRepo := transactionRepoCommand.NewCommandPostgresRepository(db.DB, logger_log)
-	transactionUseCaseQuery := transactionUseCase.NewQueryUsecase(transactionQueryPostgresRepo, logger_log)
-	transactionUseCaseCommand := transactionUseCase.NewCommandUsecase(transactionCommandPostgresRepo, saleCommandPostgresRepo, inventoryCommandPostgresRepo, logger_log)
+	transactionQueryPostgresRepo := transactionRepoQuery.NewQueryPostgresRepository(db.DB, logger)
+	transactionCommandPostgresRepo := transactionRepoCommand.NewCommandPostgresRepository(db.DB, logger)
+	transactionUseCaseQuery := transactionUseCase.NewQueryUsecase(transactionQueryPostgresRepo, logger)
+	transactionUseCaseCommand := transactionUseCase.NewCommandUsecase(transactionCommandPostgresRepo, saleCommandPostgresRepo, inventoryCommandPostgresRepo, logger)
 
-	transactionHandler.InitTransactionHttpHandler(server, transactionUseCaseQuery, transactionUseCaseCommand, logger_log)
+	transactionHandler.InitTransactionHttpHandler(server, transactionUseCaseQuery, transactionUseCaseCommand, logger)
 
 	httpServer := &http.Server{
 		Addr:           ":8080",

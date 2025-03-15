@@ -15,11 +15,11 @@ import (
 
 var DB *pgxpool.Pool
 
-func InitDB(logger zap.Logger){
+func InitDB(logger zap.Logger) {
 	err := godotenv.Load()
-  if err != nil {
-    logger.Fatal("Error loading .env file")
-  }
+	if err != nil {
+		logger.Fatal("Error loading .env file")
+	}
 
 	dbPass := os.Getenv("DB_PASS")
 	dbUser := os.Getenv("DB_USER")
@@ -35,12 +35,12 @@ func InitDB(logger zap.Logger){
 
 	config, err := pgxpool.ParseConfig(databaseUrl)
 
-	if err != nil{
+	if err != nil {
 		logger.Fatal("Failed to parse config")
 	}
 
-	config.MaxConns = 10  
-	config.MinConns = 5 
+	config.MaxConns = 10
+	config.MinConns = 5
 
 	DB, err = pgxpool.NewWithConfig(context.Background(), config)
 	if err != nil {
@@ -52,7 +52,7 @@ func InitDB(logger zap.Logger){
 	createTables()
 }
 
-func createTables(){
+func createTables() {
 	createTableQuery := `
 		CREATE TABLE IF NOT EXISTS public.items (
 			item_id VARCHAR NOT NULL,
@@ -98,7 +98,7 @@ func createTables(){
 	`
 
 	_, err = DB.Exec(context.Background(), createTableQuery)
-	
+
 	if err != nil {
 		panic(err)
 	}
@@ -148,7 +148,6 @@ func createTables(){
 	if err != nil {
 		panic(err)
 	}
-
 
 	createTableQuery = `
 		CREATE TABLE IF NOT EXISTS public.transactions (
@@ -236,7 +235,7 @@ func createTables(){
 	`
 
 	_, err = DB.Exec(context.Background(), createTableQuery)
-	if err != nil{
+	if err != nil {
 		panic(err)
 	}
 }
