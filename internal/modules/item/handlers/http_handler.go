@@ -39,7 +39,7 @@ func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.Usecas
 func (i ItemHttpHandler) getItems(ctx *gin.Context) {
 	resp, err := i.ItemUsecaseQuery.GetItems(ctx)
 	if err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not get items", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not get items", err)
 		return
 	}
 
@@ -49,17 +49,17 @@ func (i ItemHttpHandler) getItems(ctx *gin.Context) {
 func (i ItemHttpHandler) createItem(ctx *gin.Context) {
 	req := new(request.SubmitItem)
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request", err)
 		return
 	}
 
 	if err := i.Validator.Struct(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "validator error", err)
 		return
 	}
 
 	if err := i.ItemUsecaseCommand.SaveItem(ctx, *req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not save items", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not save items", err)
 		return
 	}
 
@@ -70,17 +70,17 @@ func (i ItemHttpHandler) updateItem(ctx *gin.Context) {
 	req := new(request.UpdateItem)
 
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request", err)
 		return
 	}
 
 	if err := i.Validator.Struct(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "validator error", err)
 		return
 	}
 
 	if err := i.ItemUsecaseCommand.UpdateItem(ctx, *req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update items", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not update items", err)
 		return
 	}
 
@@ -93,17 +93,17 @@ func (i ItemHttpHandler) correctItem(ctx *gin.Context) {
 	req := new(request.CorrectItem)
 
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request", err)
 		return
 	}
 
 	if err := i.Validator.Struct(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "validator error", err)
 		return
 	}
 
 	if err := i.ItemUsecaseCommand.CorrectItem(ctx, *req, id); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not correct item", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not correct item", err)
 		return
 	}
 
@@ -114,17 +114,17 @@ func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {
 	req := new(request.UpdateItem)
 
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request", err)
 		return
 	}
 
 	if err := i.Validator.Struct(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "validator error", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "validator error", err)
 		return
 	}
 
 	if err := i.ItemUsecaseCommand.BrokenItem(ctx, *req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update broken items", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not update broken items", err)
 		return
 	}
 
@@ -136,17 +136,17 @@ func (i ItemHttpHandler) updateItemPrice(ctx *gin.Context) {
 	req := new(request.ItemPrice)
 
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusBadRequest, "could not parse request", err)
+		httpres.APIErrorResponse(ctx, http.StatusBadRequest, "could not parse request", err)
 		return
 	}
 
 	if err := i.Validator.Struct(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "validator error", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "validator error", err)
 		return
 	}
 
 	if err := i.ItemUsecaseCommand.UpdateItemPrice(ctx, *req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not update item price", err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not update item price", err)
 		return
 	}
 

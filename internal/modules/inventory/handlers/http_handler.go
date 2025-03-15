@@ -35,17 +35,17 @@ func InitInventoryHttpHandler(app *gin.Engine, auq inventory.UsecaseQuery, auc i
 func (i InventoryHttpHandler) MoveInventory(ctx *gin.Context) {
 	req := new(request.MoveInventory)
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not parse request", nil)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not parse request", err)
 		return
 	}
 
 	if err := i.InventoryUsecaseCommand.MoveInventory(ctx, *req); err != nil {
 		fmt.Println(err)
-		httpres.APIResponse(ctx, http.StatusInternalServerError, "could not move items", nil)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not move items", err)
 		return
 	}
 
-	httpres.APIResponse(ctx, http.StatusOK, "test", nil)
+	httpres.APIResponse(ctx, http.StatusOK, "sucessfully moved inventory", nil)
 }
 
 func (i InventoryHttpHandler) GetInventory(ctx *gin.Context) {
@@ -54,7 +54,7 @@ func (i InventoryHttpHandler) GetInventory(ctx *gin.Context) {
 	resp, err := i.InventoryUsecaseQuery.GetInventory(ctx, location)
 	if err != nil {
 		msg := fmt.Sprintf("could not get items in inventory %v", location)
-		httpres.APIResponse(ctx, http.StatusInternalServerError, msg, err)
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, msg, err)
 		return
 	}
 
