@@ -34,6 +34,12 @@ import (
 
 	transactionUseCase "erp-api/internal/modules/transaction/usecases"
 
+	historyHandler "erp-api/internal/modules/history/handlers"
+	historyRepoCommand "erp-api/internal/modules/history/repositories/command"
+	historyRepoQuery "erp-api/internal/modules/history/repositories/queries"
+
+	historyUseCase "erp-api/internal/modules/history/usecases"
+
 	"github.com/gin-gonic/gin"
 	cors "github.com/rs/cors/wrapper/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -62,7 +68,6 @@ func setupRouter() *gin.Engine {
 
 func main() {
 	db_logger := configuration.Logger()
-
 	logger := log.GetLogger()
 
 	db.InitDB(*db_logger)
@@ -78,15 +83,23 @@ func main() {
 
 	server := setupRouter()
 
+	// initialise swagger documentation url
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	apiRoutes := server.Group("/api")
 	routes.RegisterRoutes(apiRoutes)
 
+	historyQueryPostgresRepo := historyRepoQuery.NewQueryPostgresRepository(db.DB, logger)
+	historyCommandPostgresRepo := historyRepoCommand.NewCommandPostgresRepository(db.DB, logger)
+	historyUseCaseCommand := historyUseCase.NewCommandUsecase(historyCommandPostgresRepo, logger)
+	historyUseCaseQuery := historyUseCase.NewQueryUsecase(historyQueryPostgresRepo, logger)
+
+	historyHandler.InitHistoryHttpHandler(server, historyUseCaseQuery, historyUseCaseCommand, logger)
+
 	inventoryQueryPostgresRepo := inventoryRepoQuery.NewQueryPostgresRepository(db.DB, logger)
 	inventoryCommandPostgresRepo := inventoryCommandQuery.NewCommandPostgresRepository(db.DB, logger)
 	inventoryUseCaseQuery := inventoryUseCase.NewQueryUsecase(inventoryQueryPostgresRepo, logger)
-	inventoryUseCaseCommand := inventoryUseCase.NewCommandUsecase(inventoryCommandPostgresRepo, logger)
+	inventoryUseCaseCommand := inventoryUseCase.NewCommandUsecase(inventoryCommandPostgresRepo, historyCommandPostgresRepo, logger)
 
 	inventoryHandler.InitInventoryHttpHandler(server, inventoryUseCaseQuery, inventoryUseCaseCommand, logger)
 

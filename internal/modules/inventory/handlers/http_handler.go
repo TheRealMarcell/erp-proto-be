@@ -39,11 +39,14 @@ func (i InventoryHttpHandler) MoveInventory(ctx *gin.Context) {
 		return
 	}
 
+	// move inventory
 	if err := i.InventoryUsecaseCommand.MoveInventory(ctx, *req); err != nil {
 		fmt.Println(err)
 		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not move items", err)
 		return
 	}
+
+	// add to history
 
 	httpres.APIResponse(ctx, http.StatusOK, "sucessfully moved inventory", nil)
 }
