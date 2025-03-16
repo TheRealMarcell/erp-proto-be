@@ -29,6 +29,16 @@ func InitHistoryHttpHandler(app *gin.Engine, auq history.UsecaseQuery, auc histo
 	route.GET("", handler.getHistory)
 }
 
+// GetHistory godoc
+// @Summary      Get history
+// @Description  Get a history of past item moves from different inventories
+// @Tags         History
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/history [get]
 func (h HistoryHttpHandler) getHistory(ctx *gin.Context) {
 	resp, err := h.HistoryUsecaseQuery.GetHistory(ctx)
 

@@ -36,6 +36,16 @@ func InitItemHttpHandler(app *gin.Engine, auq item.UsecaseQuery, auc item.Usecas
 	route.PUT("/price", handler.updateItemPrice)
 }
 
+// GetItems godoc
+// @Summary      Get items
+// @Description  Get a list of items stored in the repository
+// @Tags         Items
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/items [get]
 func (i ItemHttpHandler) getItems(ctx *gin.Context) {
 	resp, err := i.ItemUsecaseQuery.GetItems(ctx)
 	if err != nil {
@@ -46,6 +56,17 @@ func (i ItemHttpHandler) getItems(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "items fetched successfully", resp)
 }
 
+// CreateItem godoc
+// @Summary      Create new item (terima barang)
+// @Description  Create and save a new item, along with an initial quantity that is stored in the inventory (gudang)
+// @Tags         Items
+// @Accept       json
+// @Produce      json
+// @Param        request body request.SubmitItem true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/items [post]
 func (i ItemHttpHandler) createItem(ctx *gin.Context) {
 	req := new(request.SubmitItem)
 	if err := ctx.ShouldBindJSON(req); err != nil {
@@ -66,6 +87,17 @@ func (i ItemHttpHandler) createItem(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "successfully added items", nil)
 }
 
+// UpdateItem godoc
+// @Summary      Update an item (retur barang)
+// @Description  Return an item into the inventory, update sale retur quantity
+// @Tags         Items
+// @Accept       json
+// @Produce      json
+// @Param        request body request.UpdateItem true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/items [put]
 func (i ItemHttpHandler) updateItem(ctx *gin.Context) {
 	req := new(request.UpdateItem)
 
@@ -87,6 +119,17 @@ func (i ItemHttpHandler) updateItem(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "successfully updated items", nil)
 }
 
+// CorrectItem godoc
+// @Summary      Correct an item (koreksi barang)
+// @Description  Correct an existing item's attributes
+// @Tags         Items
+// @Accept       json
+// @Produce      json
+// @Param        request body request.CorrectItem true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/items/:id [put]
 func (i ItemHttpHandler) correctItem(ctx *gin.Context) {
 	id := ctx.Param("id")
 
@@ -110,6 +153,17 @@ func (i ItemHttpHandler) correctItem(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "success", nil)
 }
 
+// BrokenItem godoc
+// @Summary      Update an item as broken (retur barang rusak)
+// @Description  Return an item and add into inventory rusak
+// @Tags         Items
+// @Accept       json
+// @Produce      json
+// @Param        request body request.BrokenItem true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/items/rusak [put]
 func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {
 	req := new(request.UpdateItem)
 
@@ -132,6 +186,17 @@ func (i ItemHttpHandler) brokenItem(ctx *gin.Context) {
 
 }
 
+// UpdateItemPrice godoc
+// @Summary      Update item price
+// @Description  Update the price of an item
+// @Tags         Items
+// @Accept       json
+// @Produce      json
+// @Param        request body request.ItemPrice true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/items/price [put]
 func (i ItemHttpHandler) updateItemPrice(ctx *gin.Context) {
 	req := new(request.ItemPrice)
 

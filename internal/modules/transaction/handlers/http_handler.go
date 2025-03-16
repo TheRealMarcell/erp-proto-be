@@ -34,6 +34,16 @@ func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, a
 	route.PUT("/payment/:id", handler.UpdatePayment)
 }
 
+// GetTransactions godoc
+// @Summary      Get Transactions
+// @Description  Get a list of transactions
+// @Tags         Transactions
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/transactions [get]
 func (t TransactionHttpHandler) GetTransactions(ctx *gin.Context) {
 	resp, err := t.TransactionUsecaseQuery.GetTransactions(ctx)
 	if err != nil {
@@ -44,6 +54,16 @@ func (t TransactionHttpHandler) GetTransactions(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "success", resp)
 }
 
+// GetTransactionDiscount godoc
+// @Summary      Get Transaction Discounts
+// @Description  Get a list of transactions with their corresponding discount amount
+// @Tags         Transactions
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/transactions/discount_percent [get]
 func (t TransactionHttpHandler) GetTransactionDiscount(ctx *gin.Context) {
 	discount_percent, err := t.TransactionUsecaseQuery.GetDiscountPercentages(ctx)
 	if err != nil {
@@ -55,6 +75,17 @@ func (t TransactionHttpHandler) GetTransactionDiscount(ctx *gin.Context) {
 
 }
 
+// CreateTransaction godoc
+// @Summary      Create Transaction
+// @Description  Save transaction to the database
+// @Tags         Transactions
+// @Accept       json
+// @Produce      json
+// @Param        request body request.Transaction true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/transactions [post]
 func (t TransactionHttpHandler) CreateTransaction(ctx *gin.Context) {
 	req := new(request.Transaction)
 
@@ -76,6 +107,17 @@ func (t TransactionHttpHandler) CreateTransaction(ctx *gin.Context) {
 	httpres.APIResponse(ctx, http.StatusOK, "successfully added transaction", nil)
 }
 
+// CreateTransaction godoc
+// @Summary      Update Payment
+// @Description  Update the payment method associated with a transaction
+// @Tags         Transactions
+// @Accept       json
+// @Produce      json
+// @Param        request body string true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/transactions/payment/:id [post]
 func (t TransactionHttpHandler) UpdatePayment(ctx *gin.Context) {
 	id := ctx.Param("id")
 

@@ -27,6 +27,16 @@ func InitSaleHttpHandler(app *gin.Engine, auq sale.UsecaseQuery, log log.Logger)
 	route.GET("", handler.GetListSales)
 }
 
+// GetListSales godoc
+// @Summary      Get sales
+// @Description  Get a list of sales
+// @Tags         Sales
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/sales [get]
 func (s SaleHttpHandler) GetListSales(ctx *gin.Context) {
 	resp, err := s.SaleUsecaseQuery.GetSales(ctx)
 	if err != nil {

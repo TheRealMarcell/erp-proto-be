@@ -32,6 +32,17 @@ func InitInventoryHttpHandler(app *gin.Engine, auq inventory.UsecaseQuery, auc i
 	route.POST("", handler.MoveInventory)
 }
 
+// MoveInventory godoc
+// @Summary      Move item from one inventory to another (pindahan barang)
+// @Description  Given an list of items in a particular inventory, move that set of items into a different inventory and update the quantities
+// @Tags         Inventory
+// @Accept       json
+// @Produce      json
+// @Param        request body request.MoveInventory true "Request payload"
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/inventory/:location [get]
 func (i InventoryHttpHandler) MoveInventory(ctx *gin.Context) {
 	req := new(request.MoveInventory)
 	if err := ctx.ShouldBindJSON(req); err != nil {
@@ -46,11 +57,19 @@ func (i InventoryHttpHandler) MoveInventory(ctx *gin.Context) {
 		return
 	}
 
-	// add to history
-
 	httpres.APIResponse(ctx, http.StatusOK, "sucessfully moved inventory", nil)
 }
 
+// GetInventory godoc
+// @Summary      Get a list of items in inventory
+// @Description  Given an input location, return the items that exist in the inventory along with its quantity
+// @Tags         Inventory
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} httpres.HTTPResponse
+// @Failure      400 {object} httpres.HTTPError
+// @Failure      500 {object} httpres.HTTPError
+// @Router       /api/inventory/:location [get]
 func (i InventoryHttpHandler) GetInventory(ctx *gin.Context) {
 	location := ctx.Param("location") // Get location from URL param
 

@@ -1,5 +1,36 @@
 basePath: /api
 definitions:
+  entity.Item:
+    properties:
+      description:
+        type: string
+      item_id:
+        type: string
+      price:
+        type: integer
+      quantity:
+        type: integer
+    type: object
+  httpres.HTTPError:
+    properties:
+      error:
+        type: string
+      meta:
+        $ref: '#/definitions/httpres.MetaData'
+    type: object
+  httpres.HTTPResponse:
+    properties:
+      data: {}
+      meta:
+        $ref: '#/definitions/httpres.MetaData'
+    type: object
+  httpres.MetaData:
+    properties:
+      code:
+        type: integer
+      status:
+        type: string
+    type: object
   model.HTTPError:
     properties:
       code:
@@ -20,6 +51,70 @@ definitions:
       username:
         type: string
     type: object
+  request.BrokenItem:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/request.updateItemObject'
+        type: array
+    type: object
+  request.CorrectItem:
+    properties:
+      location:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  request.ItemPrice:
+    properties:
+      item_id:
+        type: string
+      price:
+        type: integer
+    type: object
+  request.MoveInventory:
+    properties:
+      destination:
+        type: string
+      items:
+        items:
+          $ref: '#/definitions/request.itemObject'
+        type: array
+      source:
+        type: string
+    type: object
+  request.SubmitItem:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/entity.Item'
+        type: array
+    type: object
+  request.Transaction:
+    type: object
+  request.UpdateItem:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/request.updateItemObject'
+        type: array
+    type: object
+  request.itemObject:
+    properties:
+      item_id:
+        type: string
+      quantity:
+        type: integer
+    type: object
+  request.updateItemObject:
+    properties:
+      item_id:
+        type: string
+      quantity:
+        type: integer
+      sale_id:
+        type: integer
+    type: object
 host: localhost:8080
 info:
   contact:
@@ -33,6 +128,353 @@ info:
   title: Sandbox API - ERP Prototype Service
   version: "1.1"
 paths:
+  /api/history:
+    get:
+      consumes:
+      - application/json
+      description: Get a history of past item moves from different inventories
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Get history
+      tags:
+      - History
+  /api/inventory/:location:
+    get:
+      consumes:
+      - application/json
+      description: Given an input location, return the items that exist in the inventory
+        along with its quantity
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Get a list of items in inventory
+      tags:
+      - Inventory
+  /api/items:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of items stored in the repository
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Get items
+      tags:
+      - Items
+    post:
+      consumes:
+      - application/json
+      description: Create and save a new item, along with an initial quantity that
+        is stored in the inventory (gudang)
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.SubmitItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Create new item (terima barang)
+      tags:
+      - Items
+    put:
+      consumes:
+      - application/json
+      description: Return an item into the inventory, update sale retur quantity
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.UpdateItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Update an item (retur barang)
+      tags:
+      - Items
+  /api/items/:id:
+    put:
+      consumes:
+      - application/json
+      description: Correct an existing item's attributes
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.CorrectItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Correct an item (koreksi barang)
+      tags:
+      - Items
+  /api/items/price:
+    put:
+      consumes:
+      - application/json
+      description: Update the price of an item
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.ItemPrice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Update item price
+      tags:
+      - Items
+  /api/items/rusak:
+    put:
+      consumes:
+      - application/json
+      description: Return an item and add into inventory rusak
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.BrokenItem'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Update an item as broken (retur barang rusak)
+      tags:
+      - Items
+  /api/sales:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of sales
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Get sales
+      tags:
+      - Sales
+  /api/transactions:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of transactions
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Get Transactions
+      tags:
+      - Transactions
+    post:
+      consumes:
+      - application/json
+      description: Save transaction to the database
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/request.Transaction'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Create Transaction
+      tags:
+      - Transactions
+  /api/transactions/discount_percent:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of transactions with their corresponding discount amount
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Get Transaction Discounts
+      tags:
+      - Transactions
+  /api/transactions/payment/:id:
+    post:
+      consumes:
+      - application/json
+      description: Update the payment method associated with a transaction
+      parameters:
+      - description: Request payload
+        in: body
+        name: request
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/httpres.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httpres.HTTPError'
+      summary: Update Payment
+      tags:
+      - Transactions
   /api/user:
     get:
       consumes:

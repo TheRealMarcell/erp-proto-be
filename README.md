@@ -15,7 +15,8 @@ This module requires the following toolkit(s):
 2. Run `go mod tidy` or by comprehensive way ```go mod download```
 3. Create an .env file on the root directory to store database configurations
 4. To start the application, run ```go run cmd/api.go``` or ```make run```
-5. Once run, to view the swagger documentation, navigate to ```http://localhost:8080/swagger/index.html```
+5. To generate swagger documentation, run ```swag init -g cmd/api.go -o docs```
+6. Once run, to view the swagger documentation, navigate to ```http://localhost:8080/swagger/index.html```
 
 ## Running with Air (Dev build)
 1. Initialise with ```air init```
