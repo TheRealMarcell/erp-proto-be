@@ -247,6 +247,7 @@ func createTables() {
       timestamp TIMESTAMP WITHOUT TIME ZONE NOT NULL,
       source VARCHAR NOT NULL,
       destination VARCHAR NOT NULL,
+			group_id VARCHAR NOT NULL,
       CONSTRAINT history_pindahan_pkey PRIMARY KEY (pindahan_id),
       CONSTRAINT history_pindahan_item_id_fkey
         FOREIGN KEY (item_id) REFERENCES items (item_id)

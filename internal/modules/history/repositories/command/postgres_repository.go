@@ -7,6 +7,7 @@ import (
 	"erp-api/internal/pkg/log"
 	"fmt"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -32,11 +33,13 @@ func (c commandPostgresRepository) BatchInsertHistory(ctx context.Context, histo
 	defer tx.Rollback(ctx)
 	batch := &pgx.Batch{}
 
+	groupID := uuid.New().String()
+
 	for _, historyItem := range history {
-		query := `INSERT INTO history_pindahan (item_id, quantity, timestamp, source, destination)
-		VALUES ($1, $2, $3, $4, $5)`
+		query := `INSERT INTO history_pindahan (item_id, quantity, timestamp, source, destination, group_id)
+		VALUES ($1, $2, $3, $4, $5, $6)`
 		batch.Queue(query, historyItem.ItemID, historyItem.Quantity,
-			historyItem.Timestamp, historyItem.Source, historyItem.Destination)
+			historyItem.Timestamp, historyItem.Source, historyItem.Destination, groupID)
 	}
 
 	results := tx.SendBatch(ctx, batch)

@@ -9,4 +9,5 @@ type History struct {
 	Timestamp   time.Time `json:"timestamp"`
 	Source      string    `json:"source"`
 	Destination string    `json:"destination"`
+	GroupID     string    `json:"group_id"`
 }

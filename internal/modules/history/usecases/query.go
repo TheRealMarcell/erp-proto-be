@@ -43,6 +43,7 @@ func (q queryUsecase) GetHistory(ctx context.Context) ([]response.History, error
 			Timestamp:   hi.Timestamp,
 			Source:      hi.Source,
 			Destination: hi.Destination,
+			GroupID:     hi.GroupID,
 		}
 		resp = append(resp, history)
 	}

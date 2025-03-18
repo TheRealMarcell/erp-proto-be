@@ -42,7 +42,7 @@ func (q queryPostgresRepository) GetListHistory(ctx context.Context) <-chan wrap
 		for rows.Next() {
 			var historyItem entity.History
 			err = rows.Scan(&historyItem.PindahanID, &historyItem.ItemID, &historyItem.Quantity,
-				&historyItem.Timestamp, &historyItem.Source, &historyItem.Destination)
+				&historyItem.Timestamp, &historyItem.Source, &historyItem.Destination, &historyItem.GroupID)
 			if err != nil {
 				output <- wrapper.Result{Error: err}
 				return
