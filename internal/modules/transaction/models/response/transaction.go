@@ -13,6 +13,7 @@ type Transaction struct {
 	Timestamp       time.Time `json:"timestamp"`
 	Location        string    `json:"location"`
 	PaymentStatus   string    `json:"payment_status"`
+	DownPayment     int64     `json:"down_payment"`
 }
 
 type GetDiscount struct {

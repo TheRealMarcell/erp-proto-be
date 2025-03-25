@@ -44,7 +44,7 @@ func (p queryPostgresRepository) FindAllTransactions(ctx context.Context) <-chan
 			var tr entity.Transaction
 			err = rows.Scan(&tr.TransactionID, &tr.DiscountType, &tr.DiscountPercent, &tr.TotalPrice,
 				&tr.TotalDiscount, &tr.PaymentID, &tr.CustomerName, &tr.Timestamp, &tr.Location,
-				&tr.PaymentStatus)
+				&tr.PaymentStatus, &tr.PaymentStatus)
 
 			if err != nil {
 				output <- wrapper.Result{Error: err}

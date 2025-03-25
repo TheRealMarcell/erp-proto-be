@@ -47,6 +47,7 @@ func (q queryUsecase) GetTransactions(ctx context.Context) ([]response.Transacti
 			Timestamp:       t.Timestamp,
 			Location:        t.Location,
 			PaymentStatus:   t.PaymentStatus,
+			DownPayment:     t.DownPayment,
 		}
 		resp = append(resp, transaction)
 	}

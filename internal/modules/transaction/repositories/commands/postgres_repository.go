@@ -24,14 +24,15 @@ func NewCommandPostgresRepository(postgres *pgxpool.Pool, log log.Logger) transa
 
 func (c commandPostgresRepository) SaveTransaction(ctx context.Context, tr request.Transaction) (int64, error) {
 	query := `
-	INSERT INTO transactions (discount_type, discount_percent, total_price, total_discount, payment_id, customer_name, timestamp, location, payment_status)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+	INSERT INTO transactions (discount_type, discount_percent, total_price, total_discount, payment_id, customer_name, timestamp, location, payment_status, down_payment)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	RETURNING transaction_id`
 
 	currentTime := time.Now()
 
 	err := c.postgres.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
-		tr.TotalDiscount, tr.TotalPrice, tr.PaymentID, tr.CustomerName, currentTime, tr.Location, tr.PaymentStatus).Scan(&tr.TransactionID)
+		tr.TotalDiscount, tr.TotalPrice, tr.PaymentID, tr.CustomerName, currentTime,
+		tr.Location, tr.PaymentStatus, tr.DownPayment).Scan(&tr.TransactionID)
 
 	if err != nil {
 		return 0, err
