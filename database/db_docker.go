@@ -134,7 +134,8 @@ func createTables() {
 			(3, 'Transfer'),
 			(4, 'Cek / GIRO'),
 			(5, 'QR'),
-			(6, 'Hutang')
+			(6, 'Hutang'),
+			(7, 'DP')
 		ON CONFLICT (payment_id) DO NOTHING;
 	`
 
