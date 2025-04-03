@@ -1,0 +1,1 @@
+(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[698],{1739:(e,n,s)=>{Promise.resolve().then(s.bind(s,8043))},8043:(e,n,s)=>{"use strict";s.d(n,{default:()=>a});var r=s(5155);function a(){return(0,r.jsx)("h1",{children:"Welcome to admin page"})}}},e=>{var n=n=>e(e.s=n);e.O(0,[441,517,358],()=>n(1739)),_N_E=e.O()}]);

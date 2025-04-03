@@ -132,5 +132,8 @@ func main() {
 		MaxHeaderBytes: 1 << 20,
 	}
 
+	// register frontend
+	server.Static("/web", "./out")
+
 	httpServer.ListenAndServe()
 }
