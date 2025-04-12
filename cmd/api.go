@@ -133,7 +133,7 @@ func main() {
 	}
 
 	// register frontend
-	server.Static("/web", "./out")
+	server.Static("/web/", "./out")
 
 	httpServer.ListenAndServe()
 }
