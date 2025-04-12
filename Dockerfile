@@ -1,23 +1,9 @@
-# syntax=docker/dockerfile:1
-
-ARG GO_VERSION=1.22.0
-FROM --platform=$BUILDPLATFORM golang:${GO_VERSION} AS build
-WORKDIR /src
-
-COPY go.mod go.sum ./
-RUN go mod download -x
-
-COPY . .
-ARG TARGETARCH
-RUN CGO_ENABLED=0 GOARCH=$TARGETARCH go build -tags docker -o /bin/server ./cmd
-
 FROM alpine:latest AS final
 
 RUN apk --update add \
     ca-certificates \
     tzdata \
-    && \
-    update-ca-certificates
+    && update-ca-certificates
 
 ARG UID=10001
 RUN adduser \
@@ -30,7 +16,11 @@ RUN adduser \
     appuser
 USER appuser
 
+# Copy server binary
 COPY --from=build /bin/server /bin/
+
+# ✅ Copy static frontend
+COPY ./out /out
 
 EXPOSE 8080
 
