@@ -16,7 +16,7 @@ WORKDIR /src
 # Leverage a cache mount to /go/pkg/mod/ to speed up subsequent builds.
 # Leverage bind mounts to go.sum and go.mod to avoid having to copy them into
 # the container.
-RUN --mount=type=cache,target=/go/pkg/mod/ \
+RUN --mount=type=cache,target=/go/pkg/mod,id=gomodcache \
     --mount=type=bind,source=go.sum,target=go.sum \
     --mount=type=bind,source=go.mod,target=go.mod \
     go mod download -x
@@ -29,7 +29,8 @@ ARG TARGETARCH
 # Leverage a cache mount to /go/pkg/mod/ to speed up subsequent builds.
 # Leverage a bind mount to the current directory to avoid having to copy the
 # source code into the container.
-RUN --mount=type=bind,target=. \
+RUN --mount=type=cache,target=/go/pkg/mod,id=gomodcache \
+    --mount=type=bind,target=. \
     CGO_ENABLED=0 GOARCH=$TARGETARCH go build -tags docker -o /bin/server ./cmd
 
 ################################################################################
@@ -47,7 +48,7 @@ FROM alpine:latest AS final
 
 # Install any runtime dependencies that are needed to run your application.
 # Leverage a cache mount to /var/cache/apk/ to speed up subsequent builds.
-RUN --mount=type=cache,target=/var/cache/apk \
+RUN --mount=type=cache,target=/var/cache/apk,id=apkcache \
     apk --update add \
         ca-certificates \
         tzdata \
