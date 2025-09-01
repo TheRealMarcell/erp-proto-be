@@ -17,6 +17,8 @@ This module requires the following toolkit(s):
 4. To start the application, run ```go run cmd/api.go``` or ```make run```
 5. To generate swagger documentation, run ```swag init -g cmd/api.go -o docs```
 6. Once run, to view the swagger documentation, navigate to ```http://localhost:8080/swagger/index.html```
+7. To view the application's web interface, navigate to ```https://localhost:8080/web```
+8. Provide a dummy login (username: user, password: user)
 
 ## Running with Air (Dev build)
 1. Initialise with ```air init```
