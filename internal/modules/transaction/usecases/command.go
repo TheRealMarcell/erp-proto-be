@@ -17,17 +17,20 @@ type commandUsecase struct {
 	transactionRepositoryCommand transaction.PostgresRepositoryCommand
 	saleRepositoryCommand        sale.PostgresRepositoryCommand
 	inventoryRepositoryCommand   inventory.PostgresRepositoryCommand
+	saleRepositoryQuery          sale.PostgresRepositoryQuery
 	logger                       log.Logger
 }
 
 func NewCommandUsecase(prq transaction.PostgresRepositoryCommand,
-	sprq sale.PostgresRepositoryCommand,
-	iprq inventory.PostgresRepositoryCommand,
+	sprc sale.PostgresRepositoryCommand,
+	iprc inventory.PostgresRepositoryCommand,
+	sprq sale.PostgresRepositoryQuery,
 	log log.Logger) transaction.UsecaseCommand {
 	return commandUsecase{
 		transactionRepositoryCommand: prq,
-		saleRepositoryCommand:        sprq,
-		inventoryRepositoryCommand:   iprq,
+		saleRepositoryCommand:        sprc,
+		inventoryRepositoryCommand:   iprc,
+		saleRepositoryQuery:          sprq,
 		logger:                       log,
 	}
 }
@@ -75,5 +78,17 @@ func (c commandUsecase) UpdatePaymentStatus(ctx context.Context, transactionId s
 	if err := c.transactionRepositoryCommand.ModifyPaymentStatus(ctx, transactionId, paymentStatus); err != nil {
 		return err
 	}
+	return nil
+}
+
+func (c commandUsecase) DeleteTransaction(ctx context.Context, transactionId string) error {
+	// TODO:⁠ ⁠get all sales based on transaction id provided
+	// TODO: ⁠⁠update all quantities of each item_id in sales in the inventory based on location
+
+	// 3.⁠ ⁠⁠delete the transaction (DONE)
+	if err := c.transactionRepositoryCommand.RemoveTransaction(ctx, transactionId); err != nil {
+		return err
+	}
+
 	return nil
 }
