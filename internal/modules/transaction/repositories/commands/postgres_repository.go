@@ -28,10 +28,13 @@ func (c commandPostgresRepository) SaveTransaction(ctx context.Context, tr reque
 	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 	RETURNING transaction_id`
 
-	currentTime := time.Now()
+	timestamp := tr.Timestamp
+	if timestamp.IsZero() {
+		timestamp = time.Now()
+	}
 
 	err := c.postgres.QueryRow(context.Background(), query, tr.DiscountType, tr.DiscountPercent,
-		tr.TotalDiscount, tr.TotalPrice, tr.PaymentID, tr.CustomerName, currentTime,
+		tr.TotalDiscount, tr.TotalPrice, tr.PaymentID, tr.CustomerName, timestamp,
 		tr.Location, tr.PaymentStatus, tr.DownPayment).Scan(&tr.TransactionID)
 
 	if err != nil {
