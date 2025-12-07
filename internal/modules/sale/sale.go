@@ -15,10 +15,11 @@ type UsecaseQuery interface {
 }
 
 type PostgresRepositoryQuery interface {
-	FindAllSales(ctx context.Context) <-chan wrapper.Result
+	FindAllSales(ctx context.Context, tid string) <-chan wrapper.Result
 }
 
 type PostgresRepositoryCommand interface {
 	BatchInsertSales(ctx context.Context, sales []entity.Sale, transactionId int64) error
 	BatchUpdateReturQty(ctx context.Context, items itemRequest.UpdateItem) error
+	BatchDeleteSales(ctx context.Context, sales []entity.Sale) error
 }

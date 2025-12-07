@@ -58,3 +58,16 @@ func (c commandPostgresRepository) ModifyPaymentStatus(ctx context.Context, tran
 
 	return nil
 }
+
+func (c commandPostgresRepository) RemoveTransaction(ctx context.Context, transactionId string) error {
+	query := `
+	DELETE FROM transactions
+	WHERE transaction_id = $1`
+
+	_, err := c.postgres.Exec(ctx, query, transactionId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

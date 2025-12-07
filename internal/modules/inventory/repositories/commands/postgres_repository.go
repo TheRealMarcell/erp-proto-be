@@ -66,9 +66,11 @@ func (c commandPostgresRepository) BatchInsertInventory(ctx context.Context, ite
 }
 
 func (c commandPostgresRepository) BatchUpdateInventory(ctx context.Context, items []itemEntity.StorageItem, location string, operation string) error {
-	// set location for updating inventory
-	for i := range items {
-		items[i].Location = location
+	if location != "" {
+		// set location for updating inventory
+		for i := range items {
+			items[i].Location = location
+		}
 	}
 
 	tx, err := c.postgres.Begin(ctx)
@@ -83,12 +85,13 @@ func (c commandPostgresRepository) BatchUpdateInventory(ctx context.Context, ite
 	for _, item := range items {
 		var query string
 
-		if operation == "add" {
+		switch operation {
+		case "add":
 			query = fmt.Sprintf(`UPDATE %s 
 				SET quantity = quantity + $1 
 				WHERE item_id = $2`, item.Location)
 
-		} else if operation == "minus" {
+		case "minus":
 			query = fmt.Sprintf(`
 				UPDATE %s 
 				SET quantity = quantity - $1 

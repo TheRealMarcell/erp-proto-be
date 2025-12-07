@@ -24,7 +24,7 @@ func NewQueryUsecase(
 }
 
 func (q queryUsecase) GetSales(ctx context.Context) ([]response.GetSaleResponse, error) {
-	respSales := <-q.saleRepositoryQuery.FindAllSales(ctx)
+	respSales := <-q.saleRepositoryQuery.FindAllSales(ctx, "")
 	if respSales.Error != nil {
 		msg := "No sales found"
 		return nil, errors.NotFound(msg)

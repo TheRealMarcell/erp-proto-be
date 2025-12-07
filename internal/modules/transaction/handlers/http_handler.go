@@ -32,6 +32,7 @@ func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, a
 
 	route.POST("", handler.CreateTransaction)
 	route.PUT("/payment/:id", handler.UpdatePayment)
+	route.DELETE("/api/transactions/:transaction_id")
 }
 
 // GetTransactions godoc
@@ -136,4 +137,11 @@ func (t TransactionHttpHandler) UpdatePayment(ctx *gin.Context) {
 	}
 
 	httpres.APIResponse(ctx, http.StatusOK, "successfully updated payment", nil)
+}
+
+func (t TransactionHttpHandler) DeleteTransaction(ctx *gin.Context) {
+	id := ctx.Param("id")
+	if err := t.TransactionUsecaseCommand.DeleteTransaction(ctx, id); err != nil {
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not delete transaction", err)
+	}
 }
