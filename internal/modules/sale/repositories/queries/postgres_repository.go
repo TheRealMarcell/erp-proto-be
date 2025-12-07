@@ -34,13 +34,13 @@ func (q queryPostgresRepository) FindAllSales(ctx context.Context, tid string) <
 		query = `
 		SELECT sale_id, description, quantity, price, total, discount_per_item, quantity_retur, transactions.transaction_id, item_id, location
 		FROM sales INNER JOIN transactions on sales.transaction_id = transactions.transaction_id
-		WHERE sales.transaction_id = $1
 		ORDER BY sale_id
 		`
 	} else {
 		query = `
 		SELECT sale_id, description, quantity, price, total, discount_per_item, quantity_retur, transactions.transaction_id, item_id, location
 		FROM sales INNER JOIN transactions on sales.transaction_id = transactions.transaction_id
+		WHERE sales.transaction_id = $1
 		ORDER BY sale_id
 		`
 	}

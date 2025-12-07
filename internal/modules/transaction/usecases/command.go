@@ -99,8 +99,9 @@ func (c commandUsecase) DeleteTransaction(ctx context.Context, transactionId str
 	var items []itemEntity.StorageItem
 
 	for _, sale := range salesData {
+		formatted_location := fmt.Sprintf("inventory_%v", sale.Location)
 		item := itemEntity.StorageItem{
-			Location:    sale.Location,
+			Location:    formatted_location,
 			ItemID:      sale.ItemID,
 			Quantity:    sale.Quantity,
 			Description: "",

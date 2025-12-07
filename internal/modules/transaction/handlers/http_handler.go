@@ -32,7 +32,7 @@ func InitTransactionHttpHandler(app *gin.Engine, auq transaction.UsecaseQuery, a
 
 	route.POST("", handler.CreateTransaction)
 	route.PUT("/payment/:id", handler.UpdatePayment)
-	route.DELETE("/api/transactions/:transaction_id")
+	route.DELETE("/:id", handler.DeleteTransaction)
 }
 
 // GetTransactions godoc
