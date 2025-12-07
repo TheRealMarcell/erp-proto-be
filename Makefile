@@ -17,3 +17,9 @@ swag-docs:
 dev:
 	@echo "Running dev mode with air live-reload"
 	air 
+
+docker-up:
+	@echo "Building the docker image, running database and server"
+	docker compose up -d
+	sleep 1
+	open http://localhost:8080/web

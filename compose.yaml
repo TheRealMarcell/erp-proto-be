@@ -44,13 +44,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  frontend:
-    build:
-      context: ../erp-proto-fe/my-app/
-    ports:
-      - 3000:3000
-    depends_on:
-      - server
+      
 volumes:
   db-data:
 
