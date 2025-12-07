@@ -86,3 +86,33 @@ func (c commandPostgresRepository) BatchUpdateReturQty(ctx context.Context, item
 
 	return nil
 }
+
+func (c commandPostgresRepository) BatchDeleteSales(ctx context.Context, sales []entity.Sale) error {
+	tx, err := c.postgres.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("transaction error: %v", err)
+	}
+
+	defer tx.Rollback(ctx)
+
+	batch := &pgx.Batch{}
+
+	for _, sale := range sales {
+		query := `DELETE FROM sales
+		WHERE sale_id = $1
+		`
+		batch.Queue(query, sale.SaleID)
+	}
+
+	results := tx.SendBatch(ctx, batch)
+
+	if err := results.Close(); err != nil {
+		return fmt.Errorf("batch insert error: %v", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("transaction commit error: %v", err)
+	}
+
+	return nil
+}

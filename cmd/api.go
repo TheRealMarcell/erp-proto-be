@@ -119,7 +119,7 @@ func main() {
 	transactionQueryPostgresRepo := transactionRepoQuery.NewQueryPostgresRepository(db.DB, logger)
 	transactionCommandPostgresRepo := transactionRepoCommand.NewCommandPostgresRepository(db.DB, logger)
 	transactionUseCaseQuery := transactionUseCase.NewQueryUsecase(transactionQueryPostgresRepo, logger)
-	transactionUseCaseCommand := transactionUseCase.NewCommandUsecase(transactionCommandPostgresRepo, saleCommandPostgresRepo, inventoryCommandPostgresRepo, logger)
+	transactionUseCaseCommand := transactionUseCase.NewCommandUsecase(transactionCommandPostgresRepo, saleCommandPostgresRepo, inventoryCommandPostgresRepo, saleQueryPostgresRepo, logger)
 
 	transactionHandler.InitTransactionHttpHandler(server, transactionUseCaseQuery, transactionUseCaseCommand, logger)
 

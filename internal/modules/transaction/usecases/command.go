@@ -5,10 +5,12 @@ import (
 	"erp-api/internal/modules/inventory"
 	itemEntity "erp-api/internal/modules/item/models/entity"
 	"erp-api/internal/modules/sale"
+	"erp-api/internal/modules/sale/models/entity"
 	"erp-api/internal/modules/transaction"
 	"erp-api/internal/modules/transaction/models/request"
 	"fmt"
 
+	"erp-api/internal/pkg/errors"
 	"erp-api/internal/pkg/helpers"
 	"erp-api/internal/pkg/log"
 )
@@ -82,10 +84,39 @@ func (c commandUsecase) UpdatePaymentStatus(ctx context.Context, transactionId s
 }
 
 func (c commandUsecase) DeleteTransaction(ctx context.Context, transactionId string) error {
-	// TODO:⁠ ⁠get all sales based on transaction id provided
-	// TODO: ⁠⁠update all quantities of each item_id in sales in the inventory based on location
+	respSales := <-c.saleRepositoryQuery.FindAllSales(ctx, transactionId)
+	if respSales.Error != nil {
+		msg := "No sales found"
+		return errors.NotFound(msg)
+	}
 
-	// 3.⁠ ⁠⁠delete the transaction (DONE)
+	salesData, ok := respSales.Data.([]entity.Sale)
+
+	if !ok {
+		return errors.InternalServerError("Cannot parse sales data")
+	}
+
+	var items []itemEntity.StorageItem
+
+	for _, sale := range salesData {
+		item := itemEntity.StorageItem{
+			Location:    sale.Location,
+			ItemID:      sale.ItemID,
+			Quantity:    sale.Quantity,
+			Description: "",
+		}
+
+		items = append(items, item)
+	}
+
+	if err := c.inventoryRepositoryCommand.BatchUpdateInventory(ctx, items, "", "add"); err != nil {
+		return err
+	}
+
+	if err := c.saleRepositoryCommand.BatchDeleteSales(ctx, salesData); err != nil {
+		return err
+	}
+
 	if err := c.transactionRepositoryCommand.RemoveTransaction(ctx, transactionId); err != nil {
 		return err
 	}

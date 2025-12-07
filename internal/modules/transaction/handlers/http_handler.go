@@ -141,5 +141,7 @@ func (t TransactionHttpHandler) UpdatePayment(ctx *gin.Context) {
 
 func (t TransactionHttpHandler) DeleteTransaction(ctx *gin.Context) {
 	id := ctx.Param("id")
-	t.TransactionUsecaseCommand.DeleteTransaction(ctx, id)
+	if err := t.TransactionUsecaseCommand.DeleteTransaction(ctx, id); err != nil {
+		httpres.APIErrorResponse(ctx, http.StatusInternalServerError, "could not delete transaction", err)
+	}
 }
